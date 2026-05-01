@@ -1,15 +1,10 @@
 import requests
 import pandas as pd
 import os
-import time
-import subprocess
 from datetime import datetime
-# 📍 السطر السحري: يجبر الكود إنه يشتغل ويحفظ الملفات داخل مجلد المشروع فقط
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-# ==========================================
-# ⚙️ إعدادات المسارات
-# ==========================================
+# إعدادات المسارات
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 EXCEL_FILE_PATH = "staff_data.xlsx"
 REPORT_PATH = "index.html"
 
@@ -22,32 +17,11 @@ API_COL_ID = "nationalId"
 # 👇 توكن الدخول 👇
 TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxNjQ5MSIsInVuaXF1ZV9uYW1lIjoi2LnYqNiv2KfZhNi52LLZitiyINi52KjYr9in2YTZhNmHINin2YTYtNmH2LHZiiIsImVtYWlsIjoiRTExMjY0MTU2MzUiLCJwcmltYXJ5Z3JvdXBzaWQiOiJFbXBsb3llZSIsIkFwcGxpY2F0aW9uIjoiUG9ydGFsIiwiRGV2aWNlU2VyaWFsIjoiIiwibmJmIjoxNzc3NjEyNTM4LCJleHAiOjE3Nzc2NTU3MzgsImlhdCI6MTc3NzYxMjUzOCwiaXNzIjoiVGFuYXFvbEFQSSIsImF1ZCI6IlRhbmFxb2xBUEkifQ.kllYcwHoTovb_nsqYEmgwiEi2fyR8qI8FV8pQh8yKlE"
 
-# ==========================================
-# 📤 وظيفة الرفع التلقائي لـ GitHub
-# ==========================================
-def auto_git_push():
-    try:
-        # توجيه الكود لمسار المشروع لضمان عدم حدوث خطأ في مسار Git
-        os.chdir(os.path.dirname(os.path.abspath(__file__)))
-        
-        print("📤 جاري الرفع التلقائي إلى GitHub...")
-        subprocess.run(["git", "add", "index.html"], check=True)
-        commit_msg = f"Auto-update: {datetime.now().strftime('%Y-%m-%d %I:%M %p')}"
-        subprocess.run(["git", "commit", "-m", commit_msg], check=True)
-        subprocess.run(["git", "push", "origin", "main"], check=True)
-        print("✨ تم تحديث الموقع بنجاح على GitHub و Netlify!")
-    except Exception as e:
-        print(f"⚠️ تنبيه الرفع: قد لا توجد تغييرات جديدة أو تأكد من ارتباطك بالنت ({e})")
-
-# ==========================================
-# 📊 وظيفة سحب البيانات وبناء التقرير
-# ==========================================
 def update_dashboard():
     current_time_str = datetime.now().strftime("%I:%M %p")
-    print(f"\n[{current_time_str}] 🚀 جاري سحب البيانات المحدثة وتجهيز الإحصائيات الشاملة...")
+    print(f"\n[{current_time_str}] 🚀 جاري سحب البيانات في السيرفر السحابي...")
     
     url = "https://tnql-prod.sejeltech.app/api/StaffMember/GetStaffMember"
-
     headers = {
         "accept": "application/json",
         "authorization": TOKEN,
@@ -55,27 +29,12 @@ def update_dashboard():
         "lang": "ar",
         "referrer": "https://tnql-prod.sejeltech.app/human-resource/staff-list"
     }
-
     payload = {
-        "paging": {
-            "sortField": "Id",
-            "searchOrder": 2,
-            "pageIndex": 1,
-            "totalRowsCount": 10437,
-            "totalPages": 1044,
-            "pageSize": 5000, 
-            "sortBy": "Id Desc"
-        },
-        "data": {
-            "searchText": "", "name": "", "EmployeeId": None, "OccupationIds": [],
-            "DepartmentIds": [], "SectionIds": [], "WorkShiftIds": [], "EmployeeTypes": [],
-            "ManagerIds": [], "OperatorCompanyIds": [], "NationalIdExpired": [],
-            "ActiveStatus": [True], "isPrinted": None, "isDeleted": False
-        }
+        "paging": {"sortField": "Id", "searchOrder": 2, "pageIndex": 1, "totalRowsCount": 10437, "totalPages": 1044, "pageSize": 5000, "sortBy": "Id Desc"},
+        "data": {"searchText": "", "name": "", "EmployeeId": None, "OccupationIds": [], "DepartmentIds": [], "SectionIds": [], "WorkShiftIds": [], "EmployeeTypes": [], "ManagerIds": [], "OperatorCompanyIds": [], "NationalIdExpired": [], "ActiveStatus": [True], "isPrinted": None, "isDeleted": False}
     }
 
     all_employees = []
-
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=60)
         if response.status_code == 200:
@@ -83,13 +42,7 @@ def update_dashboard():
             if api_res and 'data' in api_res:
                 res_data = api_res['data']
                 all_employees = res_data if isinstance(res_data, list) else res_data.get('list', [])
-                print(f"✅ تم سحب {len(all_employees)} موظف فعال بنجاح!")
-            else:
-                print("⚠️ السيرفر رد بنجاح لكن حقل 'data' فارغ (قد يكون التوكن منتهي).")
-                return False
-        else:
-            print(f"❌ فشل الاتصال. الكود: {response.status_code} (تأكد من تحديث التوكن)")
-            return False
+                print(f"✅ تم سحب {len(all_employees)} موظف فعال!")
     except Exception as e:
         print(f"❌ خطأ تقني: {e}")
         return False
@@ -107,13 +60,10 @@ def update_dashboard():
                     df_excel[id_col] = df_excel[id_col].astype(str).str.strip()
                     excel_subset = df_excel.drop_duplicates(subset=[id_col])
                     df = pd.merge(df, excel_subset, left_on=API_COL_ID, right_on=id_col, how='left')
-                    
                     for api_c, ex_list in [('operatorCompanyName', COL_NAMES_COMPANY), ('occupationName', COL_NAMES_JOB), ('workShiftName', COL_NAMES_SHIFT)]:
                         ex_c = next((c for c in ex_list if c in df_excel.columns), None)
                         if ex_c: df[api_c] = df[ex_c].fillna(df[api_c])
-                    print("👑 تم دمج المسميات من الإكسيل.")
-            except Exception as e: 
-                print(f"⚠️ تنبيه الإكسيل: {e}")
+            except Exception as e: pass
 
         df = df.fillna('غير محدد').replace(['null', 'None', 'nan', '', None], 'غير محدد')
 
@@ -130,6 +80,39 @@ def update_dashboard():
         df['mapped_type'] = df['employeeTypeName'].apply(clean_type)
         permanent_count = len(df[df['mapped_type'] == 'دائم'])
         seasonal_count = len(df[df['mapped_type'] == 'موسمي'])
+
+        # 🛠️ التعديل هنا: بناء الأقسام برمجياً بشكل منفصل عشان السيرفر ما يضيع
+        companies_html = ""
+        for c in df['operatorCompanyName'].unique():
+            company_count = len(df[df['operatorCompanyName']==c])
+            shifts_html = ""
+            for s in df[df['operatorCompanyName']==c]['workShiftName'].unique():
+                jobs_html = ""
+                for j, v in df[(df['operatorCompanyName']==c) & (df['workShiftName']==s)]['occupationName'].value_counts().items():
+                    jobs_html += f'<li><span>{j}</span><span class="job-val">{v}</span></li>\n'
+                
+                shifts_html += f"""
+                <div class="shift-box">
+                    <span class="shift-name">📍 {s}</span>
+                    <ul class="jobs-list">
+                        {jobs_html}
+                    </ul>
+                </div>"""
+                
+            companies_html += f"""
+            <div class="company-card">
+                <div class="company-title">
+                    <span>🏢 {c}</span>
+                    <span class="company-badge">العدد: {company_count}</span>
+                </div>
+                <div class="shift-grid">
+                    {shifts_html}
+                </div>
+            </div>"""
+
+        grand_summary_html = ""
+        for j, v in df['occupationName'].value_counts().items():
+            grand_summary_html += f'<div class="grand-item"><span>{j}</span><span class="job-val">{v}</span></div>\n'
 
         html_content = f"""<!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -175,7 +158,7 @@ def update_dashboard():
             <span class="name">Abdulaziz Alshehri</span>
         </div>
         <h1>التقرير الشامل لموسم حج 1447</h1>
-        <div class="live-indicator"><span class="pulse"></span>آخر تحديث تلقائي: {current_time_str}</div>
+        <div class="live-indicator"><span class="pulse"></span>آخر تحديث للسيرفر: {current_time_str}</div>
     </div>
 
     <div class="stats-container">
@@ -187,30 +170,13 @@ def update_dashboard():
     </div>
 
     <div class="content">
-        {''' '''.join([f'''
-        <div class="company-card">
-            <div class="company-title">
-                <span>🏢 {c}</span>
-                <span class="company-badge">العدد: {len(df[df['operatorCompanyName']==c])}</span>
-            </div>
-            <div class="shift-grid">
-                {" ".join([f'''
-                <div class="shift-box">
-                    <span class="shift-name">📍 {s}</span>
-                    <ul class="jobs-list">
-                        {" ".join([f'<li><span>{j}</span><span class="job-val">{v}</span></li>' 
-                        for j, v in df[(df['operatorCompanyName']==c) & (df['workShiftName']==s)]['occupationName'].value_counts().items()])}
-                    </ul>
-                </div>''' for s in df[df['operatorCompanyName']==c]['workShiftName'].unique()])}
-            </div>
-        </div>''' for c in df['operatorCompanyName'].unique()])}
+        {companies_html}
     </div>
 
     <div class="grand-summary">
         <h2>📊 الملخص العام للوظائف (كافة الشركات)</h2>
         <div class="grand-grid">
-            {" ".join([f'<div class="grand-item"><span>{j}</span><span class="job-val">{v}</span></div>' 
-            for j, v in df['occupationName'].value_counts().items()])}
+            {grand_summary_html}
         </div>
     </div>
 
@@ -221,18 +187,9 @@ def update_dashboard():
 </body>
 </html>
 """
-
         with open(REPORT_PATH, "w", encoding="utf-8") as f:
             f.write(html_content)
-        print("🏆 تمت المهمة بنجاح! تم تحديث ملف الإحصائيات (index.html).")
-        return True
-    else:
-        print("🛑 لم يتم العثور على بيانات لإنشاء التقرير.")
-        return False
+        print("🏆 تم تحديث ملف الإحصائيات (index.html) بنجاح!")
 
-# ==========================================
-# ==========================================
-# ☁️ تشغيل لمرة واحدة (السيرفر سيتكفل بالتكرار والرفع)
-# ==========================================
 if __name__ == "__main__":
     update_dashboard()
