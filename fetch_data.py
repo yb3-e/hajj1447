@@ -1,12 +1,12 @@
 import requests
 import pandas as pd
 import os
-import re
 import time
+import subprocess
 from datetime import datetime
 
 # ==========================================
-# ⚙️ إعدادات المسارات (تم الاحتفاظ بمساراتك)
+# ⚙️ إعدادات المسارات
 # ==========================================
 EXCEL_FILE_PATH = "staff_data.xlsx"
 REPORT_PATH = "index.html"
@@ -17,9 +17,29 @@ COL_NAMES_JOB = ["المهنة", "الوظيفة"]
 COL_NAMES_SHIFT = ["الوردية", "الوقت"]
 API_COL_ID = "nationalId" 
 
-# 👇 هنا تحط التوكن الجديد كل يوم الصباح 👇
-TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxNjQ5MSIsInVuaXF1ZV9uYW1lIjoi2LnYqNiv2KfZhNi52LLZitiyINi52KjYr9in2YTZhNmHINin2YTYtNmH2LHZiiIsImVtYWlsIjoiRTExMjY0MTU2MzUiLCJwcmltYXJ5Z3JvdXBzaWQiOiJFbXBsb3llZSIsIkFwcGxpY2F0aW9uIjoiUG9ydGFsIiwiRGV2aWNlU2VyaWFsIjoiIiwibmJmIjoxNzc3NjEyNTM4LCJleHAiOjE3Nzc2NTU3MzgsImlhdCI6MTc3NzYxMjUzOCwiaXNzIjoiVGFuYXFvbEFQSSIsImF1ZCI6IlRhbmFxb2xBUEkifQ.kllYcwHoTovb_nsqYEmgwiEi2fyR8qI8FV8pQh8yKlE"# ==========================================
+# 👇 توكن الدخول 👇
+TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxNjQ5MSIsInVuaXF1ZV9uYW1lIjoi2LnYqNiv2KfZhNi52LLZitiyINi52KjYr9in2YTZhNmHINin2YTYtNmH2LHZiiIsImVtYWlsIjoiRTExMjY0MTU2MzUiLCJwcmltYXJ5Z3JvdXBzaWQiOiJFbXBsb3llZSIsIkFwcGxpY2F0aW9uIjoiUG9ydGFsIiwiRGV2aWNlU2VyaWFsIjoiIiwibmJmIjoxNzc3NjEyNTM4LCJleHAiOjE3Nzc2NTU3MzgsImlhdCI6MTc3NzYxMjUzOCwiaXNzIjoiVGFuYXFvbEFQSSIsImF1ZCI6IlRhbmFxb2xBUEkifQ.kllYcwHoTovb_nsqYEmgwiEi2fyR8qI8FV8pQh8yKlE"
 
+# ==========================================
+# 📤 وظيفة الرفع التلقائي لـ GitHub
+# ==========================================
+def auto_git_push():
+    try:
+        # توجيه الكود لمسار المشروع لضمان عدم حدوث خطأ في مسار Git
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+        
+        print("📤 جاري الرفع التلقائي إلى GitHub...")
+        subprocess.run(["git", "add", "index.html"], check=True)
+        commit_msg = f"Auto-update: {datetime.now().strftime('%Y-%m-%d %I:%M %p')}"
+        subprocess.run(["git", "commit", "-m", commit_msg], check=True)
+        subprocess.run(["git", "push", "origin", "main"], check=True)
+        print("✨ تم تحديث الموقع بنجاح على GitHub و Netlify!")
+    except Exception as e:
+        print(f"⚠️ تنبيه الرفع: قد لا توجد تغييرات جديدة أو تأكد من ارتباطك بالنت ({e})")
+
+# ==========================================
+# 📊 وظيفة سحب البيانات وبناء التقرير
+# ==========================================
 def update_dashboard():
     current_time_str = datetime.now().strftime("%I:%M %p")
     print(f"\n[{current_time_str}] 🚀 جاري سحب البيانات المحدثة وتجهيز الإحصائيات الشاملة...")
@@ -64,13 +84,13 @@ def update_dashboard():
                 print(f"✅ تم سحب {len(all_employees)} موظف فعال بنجاح!")
             else:
                 print("⚠️ السيرفر رد بنجاح لكن حقل 'data' فارغ (قد يكون التوكن منتهي).")
-                return
+                return False
         else:
             print(f"❌ فشل الاتصال. الكود: {response.status_code} (تأكد من تحديث التوكن)")
-            return
+            return False
     except Exception as e:
         print(f"❌ خطأ تقني: {e}")
-        return
+        return False
 
     if all_employees:
         df = pd.DataFrame(all_employees)
@@ -90,7 +110,8 @@ def update_dashboard():
                         ex_c = next((c for c in ex_list if c in df_excel.columns), None)
                         if ex_c: df[api_c] = df[ex_c].fillna(df[api_c])
                     print("👑 تم دمج المسميات من الإكسيل.")
-            except Exception as e: print(f"⚠️ تنبيه الإكسيل: {e}")
+            except Exception as e: 
+                print(f"⚠️ تنبيه الإكسيل: {e}")
 
         df = df.fillna('غير محدد').replace(['null', 'None', 'nan', '', None], 'غير محدد')
 
@@ -129,7 +150,8 @@ def update_dashboard():
         .stat-card b {{ display: block; font-size: 2.5em; color: var(--primary); line-height: 1.1; margin-bottom: 5px; }}
         .stat-card span {{ font-size: 0.95em; font-weight: 700; color: #7f8c8d; }}
         .company-card {{ background: white; padding: 35px; border-radius: 30px; margin-bottom: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); }}
-        .company-title {{ font-size: 2em; color: var(--primary); border-bottom: 3px solid #f0f0f0; padding-bottom: 20px; margin-bottom: 25px; font-weight: 900; }}
+        .company-title {{ font-size: 2em; color: var(--primary); border-bottom: 3px solid #f0f0f0; padding-bottom: 20px; margin-bottom: 25px; font-weight: 900; display: flex; justify-content: space-between; align-items: center; }}
+        .company-badge {{ background: var(--accent); color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.5em; font-weight: 700; }}
         .shift-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }}
         .shift-box {{ background: #fafafa; border: 1px solid #eef2f3; padding: 25px; border-radius: 20px; }}
         .shift-name {{ color: var(--secondary); font-weight: 800; font-size: 1.3em; margin-bottom: 15px; display: block; border-right: 5px solid var(--accent); padding-right: 15px; }}
@@ -165,7 +187,10 @@ def update_dashboard():
     <div class="content">
         {''' '''.join([f'''
         <div class="company-card">
-            <div class="company-title">🏢 {c}</div>
+            <div class="company-title">
+                <span>🏢 {c}</span>
+                <span class="company-badge">العدد: {len(df[df['operatorCompanyName']==c])}</span>
+            </div>
             <div class="shift-grid">
                 {" ".join([f'''
                 <div class="shift-box">
@@ -198,14 +223,19 @@ def update_dashboard():
         with open(REPORT_PATH, "w", encoding="utf-8") as f:
             f.write(html_content)
         print("🏆 تمت المهمة بنجاح! تم تحديث ملف الإحصائيات (index.html).")
+        return True
     else:
         print("🛑 لم يتم العثور على بيانات لإنشاء التقرير.")
+        return False
 
 # ==========================================
 # 🔄 حلقة التحديث التلقائي (المحرك الأساسي)
 # ==========================================
 if __name__ == "__main__":
     while True:
-        update_dashboard()
+        success = update_dashboard()
+        if success:
+            auto_git_push() # هنا يرفع لـ GitHub تلقائياً إذا سحب البيانات نجح
+        
         print("\n⏳ الكود سيدخل في وضع النوم لمدة ساعتين... (لا تقفل الشاشة السوداء)")
         time.sleep(7200) # 7200 ثانية = ساعتين بالضبط
