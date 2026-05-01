@@ -197,7 +197,7 @@ def update_dashboard():
 
         with open(REPORT_PATH, "w", encoding="utf-8") as f:
             f.write(html_content)
-        print("🏆 تمت المهمة بنجاح! تم تحديث ملف الإحصائيات (Auto_Live_Report_Active.html).")
+        print("🏆 تمت المهمة بنجاح! تم تحديث ملف الإحصائيات (index.html).")
     else:
         print("🛑 لم يتم العثور على بيانات لإنشاء التقرير.")
 
