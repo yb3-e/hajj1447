@@ -17,10 +17,11 @@ API_COL_ID = "nationalId"
 # سحب التوكن من خزنة قتهب السحابية
 TOKEN = os.getenv("HAJJ_TOKEN")
 
-if not TOKEN:
-    print("❌ تنبيه: التوكن غير موجود في الخزنة السرية!")
-    exit()
 def update_dashboard():
+    if not TOKEN:
+        print("❌ تنبيه: التوكن غير موجود في الخزنة السرية!")
+        return False
+
     current_time_str = datetime.now().strftime("%I:%M %p")
     print(f"\n[{current_time_str}] 🚀 جاري سحب البيانات في السيرفر السحابي...")
     
@@ -84,19 +85,27 @@ def update_dashboard():
         permanent_count = len(df[df['mapped_type'] == 'دائم'])
         seasonal_count = len(df[df['mapped_type'] == 'موسمي'])
 
-        # 🛠️ التعديل هنا: بناء الأقسام برمجياً بشكل منفصل عشان السيرفر ما يضيع
+        # 🛠️ بناء الأقسام برمجياً 
         companies_html = ""
         for c in df['operatorCompanyName'].unique():
             company_count = len(df[df['operatorCompanyName']==c])
             shifts_html = ""
             for s in df[df['operatorCompanyName']==c]['workShiftName'].unique():
+                
+                # 👇 التعديل الجديد: حساب عدد الموظفين الإجمالي في هذه الوردية 👇
+                shift_count = len(df[(df['operatorCompanyName']==c) & (df['workShiftName']==s)])
+                
                 jobs_html = ""
                 for j, v in df[(df['operatorCompanyName']==c) & (df['workShiftName']==s)]['occupationName'].value_counts().items():
                     jobs_html += f'<li><span>{j}</span><span class="job-val">{v}</span></li>\n'
                 
+                # 👇 إضافة الرقم بجانب اسم الوردية بشكل جميل 👇
                 shifts_html += f"""
                 <div class="shift-box">
-                    <span class="shift-name">📍 {s}</span>
+                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>📍 {s}</span>
+                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: {shift_count}</span>
+                    </span>
                     <ul class="jobs-list">
                         {jobs_html}
                     </ul>
@@ -106,7 +115,7 @@ def update_dashboard():
             <div class="company-card">
                 <div class="company-title">
                     <span>🏢 {c}</span>
-                    <span class="company-badge">العدد: {company_count}</span>
+                    <span class="company-badge">العدد الكلي: {company_count}</span>
                 </div>
                 <div class="shift-grid">
                     {shifts_html}
@@ -142,7 +151,7 @@ def update_dashboard():
         .company-badge {{ background: var(--accent); color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.5em; font-weight: 700; }}
         .shift-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }}
         .shift-box {{ background: #fafafa; border: 1px solid #eef2f3; padding: 25px; border-radius: 20px; }}
-        .shift-name {{ color: var(--secondary); font-weight: 800; font-size: 1.3em; margin-bottom: 15px; display: block; border-right: 5px solid var(--accent); padding-right: 15px; }}
+        .shift-name {{ color: var(--secondary); font-weight: 800; font-size: 1.3em; margin-bottom: 15px; border-right: 5px solid var(--accent); padding-right: 15px; }}
         .jobs-list {{ list-style: none; padding: 0; margin: 0; }}
         .jobs-list li {{ display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ddd; font-weight: 700; }}
         .job-val {{ background: var(--primary); color: white; padding: 3px 12px; border-radius: 8px; font-size: 0.9em; }}
@@ -192,7 +201,7 @@ def update_dashboard():
 """
         with open(REPORT_PATH, "w", encoding="utf-8") as f:
             f.write(html_content)
-        print("🏆 تم تحديث ملف الإحصائيات (index.html) بنجاح!")
+        print("🏆 تم تحديث ملف الإحصائيات بنجاح!")
 
 if __name__ == "__main__":
     update_dashboard()
