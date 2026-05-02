@@ -90,7 +90,10 @@ def update_dashboard():
             company_count = len(df[df['operatorCompanyName']==c])
             shifts_html = ""
             for s in df[df['operatorCompanyName']==c]['workShiftName'].unique():
+                
+                # إضافة عدد الوردية هنا
                 shift_count = len(df[(df['operatorCompanyName']==c) & (df['workShiftName']==s)])
+                
                 jobs_html = ""
                 for j, v in df[(df['operatorCompanyName']==c) & (df['workShiftName']==s)]['occupationName'].value_counts().items():
                     jobs_html += f'<li><span>{j}</span><span class="job-val">{v}</span></li>\n'
