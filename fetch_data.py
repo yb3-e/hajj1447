@@ -14,9 +14,12 @@ COL_NAMES_JOB = ["المهنة", "الوظيفة"]
 COL_NAMES_SHIFT = ["الوردية", "الوقت"]
 API_COL_ID = "nationalId" 
 
-# 👇 توكن الدخول 👇
-TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxNjQ5MSIsInVuaXF1ZV9uYW1lIjoi2LnYqNiv2KfZhNi52LLZitiyINi52KjYr9in2YTZhNmHINin2YTYtNmH2LHZiiIsImVtYWlsIjoiRTExMjY0MTU2MzUiLCJwcmltYXJ5Z3JvdXBzaWQiOiJFbXBsb3llZSIsIkFwcGxpY2F0aW9uIjoiUG9ydGFsIiwiRGV2aWNlU2VyaWFsIjoiIiwibmJmIjoxNzc3NjY5NDg3LCJleHAiOjE3Nzc3MTI2ODcsImlhdCI6MTc3NzY2OTQ4NywiaXNzIjoiVGFuYXFvbEFQSSIsImF1ZCI6IlRhbmFxb2xBUEkifQ.DKRVD7Azd-buvh8bQX3jDnAP3ZPjIL7Ts0HY6QUAa3g"
+# سحب التوكن من خزنة قتهب السحابية
+TOKEN = os.getenv("HAJJ_TOKEN")
 
+if not TOKEN:
+    print("❌ تنبيه: التوكن غير موجود في الخزنة السرية!")
+    exit()
 def update_dashboard():
     current_time_str = datetime.now().strftime("%I:%M %p")
     print(f"\n[{current_time_str}] 🚀 جاري سحب البيانات في السيرفر السحابي...")
