@@ -1,19 +1,15 @@
-name: Auto Update Dashboard
+name: 🔄 تحديث بيانات الحج تلقائياً
 
 on:
   schedule:
-    - cron: '0 */2 * * *' # تشغيل الكود كل ساعتين
-  workflow_dispatch: # إضافة زر في GitHub لتشغيل الكود يدوياً متى ما بغيت
-
-permissions:
-  contents: write # إعطاء الصلاحية للروبوت عشان يقدر يسوي Push للملفات
+    - cron: '0 */2 * * *' # يشتغل كل ساعتين
+  workflow_dispatch: # يسمح لك بتشغيله يدوياً
 
 jobs:
-  update-data:
-    runs-on: ubuntu-latest # نظام التشغيل حق السيرفر
-
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - name: 📥 جلب ملفات المشروع
+      - name: 📥 سحب الكود من المستودع
         uses: actions/checkout@v4
 
       - name: 🐍 إعداد بيئة بايثون
@@ -21,17 +17,19 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: 📦 تثبيت المكتبات المطلوبة
+      - name: 📦 تثبيت المكتبات اللازمة
         run: |
-          python -m pip install --upgrade pip
           pip install requests pandas openpyxl
 
-      - name: 🚀 تشغيل كود سحب البيانات (كود المهندس عبدالعزيز)
+      - name: 🚀 تشغيل كود سحب البيانات
+        env:
+          HAJJ_TOKEN: ${{ secrets.HAJJ_TOKEN }}
         run: python fetch_data.py
-- name: 🚀 رفع التحديثات
+
+      - name: 📤 رفع التحديثات إلى GitHub
         run: |
           git config --global user.name "GitHub-Actions-Bot"
           git config --global user.email "actions@github.com"
-          git add index.html || echo "File not found, skipping add"
-          git commit -m "تحديث تلقائي للبيانات 🔄" || echo "No changes to commit"
+          git add index.html || echo "الملف غير موجود حالياً"
+          git commit -m "تحديث تلقائي للبيانات 🔄" || echo "لا توجد تغييرات للرفع"
           git push origin main
