@@ -85,21 +85,16 @@ def update_dashboard():
         permanent_count = len(df[df['mapped_type'] == 'دائم'])
         seasonal_count = len(df[df['mapped_type'] == 'موسمي'])
 
-        # 🛠️ بناء الأقسام برمجياً 
         companies_html = ""
         for c in df['operatorCompanyName'].unique():
             company_count = len(df[df['operatorCompanyName']==c])
             shifts_html = ""
             for s in df[df['operatorCompanyName']==c]['workShiftName'].unique():
-                
-                # 👇 التعديل الجديد: حساب عدد الموظفين الإجمالي في هذه الوردية 👇
                 shift_count = len(df[(df['operatorCompanyName']==c) & (df['workShiftName']==s)])
-                
                 jobs_html = ""
                 for j, v in df[(df['operatorCompanyName']==c) & (df['workShiftName']==s)]['occupationName'].value_counts().items():
                     jobs_html += f'<li><span>{j}</span><span class="job-val">{v}</span></li>\n'
                 
-                # 👇 إضافة الرقم بجانب اسم الوردية بشكل جميل 👇
                 shifts_html += f"""
                 <div class="shift-box">
                     <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
