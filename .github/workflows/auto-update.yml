@@ -28,11 +28,10 @@ jobs:
 
       - name: 🚀 تشغيل كود سحب البيانات (كود المهندس عبدالعزيز)
         run: python fetch_data.py
-
-      - name: 📤 رفع التحديثات للموقع
+- name: 🚀 رفع التحديثات
         run: |
           git config --global user.name "GitHub-Actions-Bot"
           git config --global user.email "actions@github.com"
-          git add index.html
-          git commit -m "تحديث تلقائي: سحب بيانات جديدة ☁️" || echo "لا يوجد تغيير في البيانات للرفع"
-          git push
+          git add index.html || echo "File not found, skipping add"
+          git commit -m "تحديث تلقائي للبيانات 🔄" || echo "No changes to commit"
+          git push origin main
