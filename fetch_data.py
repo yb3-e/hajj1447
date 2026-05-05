@@ -2,7 +2,7 @@ import time
 import os
 import requests
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -17,7 +17,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REPORT_PATH = os.path.join(BASE_DIR, "index.html")
 EXCEL_PATH = os.path.join(BASE_DIR, "staff_data.xlsx") 
 
-# سحب البيانات من أسرار قيت هب
 USERNAME = os.getenv('HAJJ_USER')
 PASSWORD = os.getenv('HAJJ_PASS')
 
@@ -73,8 +72,18 @@ def get_hajj_token():
         if driver: driver.quit()
 
 def generate_master_dashboard():
-    current_time_str = datetime.now().strftime("%Y-%m-%d %I:%M %p")
-    print(f"\n[{current_time_str}] 🚀 جاري بناء لوحة البيانات المدمجة...")
+    # 🎯 توقيت مكة المكرمة
+    makkah_time = datetime.utcnow() + timedelta(hours=3)
+    current_time_str = makkah_time.strftime("%Y-%m-%d %I:%M %p")
+    hour = makkah_time.hour
+    
+    # تحديد الوردية الحالية للعرض في العنوان فقط
+    if 8 <= hour < 16:
+        active_shift = "الوردية الثانية (8ص - 4م)"
+    elif 16 <= hour < 24:
+        active_shift = "الوردية الثالثة (4م - 12ص)"
+    else:
+        active_shift = "الوردية الأولى (12ص - 8ص)"
 
     # 1. تجهيز قاعدة بيانات الإكسيل
     excel_db = {}
@@ -91,16 +100,13 @@ def generate_master_dashboard():
                         'company': str(row.get('شركة التشغيل', 'غير متوفر')).strip()
                     }
         except Exception as e:
-            print(f"⚠️ تحذير الإكسيل: {e}")
+            pass
 
     token = get_hajj_token()
     if not token: 
-        print("❌ لم يتم استخراج التوكن.")
         return
 
     headers = {"authorization": token, "content-type": "application/json", "lang": "ar"}
-    
-    # 🎯 هنا السر: الـ Payload الكامل اللي يرضي سيرفرهم ويجيب البيانات
     payload = {
         "paging": {"sortField": "Id", "searchOrder": 2, "pageIndex": 1, "totalRowsCount": 10469, "totalPages": 1, "pageSize": 11000, "sortBy": "Id Desc"},
         "data": {
@@ -120,12 +126,8 @@ def generate_master_dashboard():
         present_ids = {str(x.get('employeeCode')).strip().lower() for x in att_data if isinstance(x, dict) and x.get('employeeCode')}
 
         if not all_employees:
-            print("🛑 لم يتم العثور على بيانات، تأكد من الرد حق السيرفر.")
             return
 
-        print(f"👥 تم سحب {len(all_employees)} موظف بنجاح!")
-
-        # 3. دمج بيانات السيرفر مع الإكسيل
         for emp in all_employees:
             nid = str(emp.get('nationalId', '')).replace('.0', '').strip().lower()
             if nid in excel_db:
@@ -177,7 +179,8 @@ def generate_master_dashboard():
                 .company-title {{ font-size: 2em; color: var(--primary); border-bottom: 3px solid #f0f0f0; padding-bottom: 20px; margin-bottom: 25px; font-weight: 900; }}
                 .shift-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }}
                 .shift-box {{ background: #fafafa; border: 1px solid #eef2f3; padding: 25px; border-radius: 20px; }}
-                .shift-name {{ color: var(--secondary); font-weight: 800; font-size: 1.3em; margin-bottom: 15px; display: block; border-right: 5px solid var(--accent); padding-right: 15px; }}
+                .shift-name {{ color: var(--secondary); font-weight: 800; font-size: 1.3em; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-right: 5px solid var(--accent); padding-right: 15px; }}
+                .shift-total-badge {{ font-size: 0.75em; background: #e0f2f1; color: var(--primary); padding: 5px 12px; border-radius: 12px; font-weight: 900; }}
                 .jobs-list {{ list-style: none; padding: 0; margin: 0; }}
                 .jobs-list li {{ display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ddd; font-weight: 700; }}
                 .job-val {{ background: var(--primary); color: white; padding: 3px 12px; border-radius: 8px; }}
@@ -193,6 +196,7 @@ def generate_master_dashboard():
             <div class="header">
                 <div class="eng-badge" dir="ltr"><span class="title">Eng.</span><span class="name">Abdulaziz Alshehri</span></div>
                 <h1>التقرير الشامل لموسم حج 1447</h1>
+                <div style="font-size: 1.2em; margin-top: 10px; color: #e0f2f1;">الوقت الحالي بتوقيت مكة: {active_shift}</div>
                 <div class="live-indicator"><span class="pulse"></span>آخر تحديث تلقائي: {current_time_str}</div>
             </div>
 
@@ -208,16 +212,22 @@ def generate_master_dashboard():
                 <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 إحصائيات الورديات والوظائف</h2>
         """
 
+        # 4. بناء إحصائيات الشركات والورديات (مع إضافة إجمالي الموظفين لكل وردية)
         for company in df['operatorCompanyName'].unique():
             if pd.isna(company) or company == 'غير محدد': continue
             html_content += f"<div class='company-card'><div class='company-title'>🏢 {company}</div><div class='shift-grid'>"
             for shift in df[df['operatorCompanyName']==company]['workShiftName'].unique():
-                shift_jobs = df[(df['operatorCompanyName']==company) & (df['workShiftName']==shift)]['occupationName'].value_counts()
+                shift_df = df[(df['operatorCompanyName']==company) & (df['workShiftName']==shift)]
+                shift_total = len(shift_df) # 🎯 هنا رجعنا حساب الإجمالي لكل وردية
+                shift_jobs = shift_df['occupationName'].value_counts()
                 jobs_html = "".join([f"<li><span>{j}</span><span class='job-val'>{v}</span></li>" for j, v in shift_jobs.items()])
-                html_content += f"<div class='shift-box'><span class='shift-name'>📍 {shift}</span><ul class='jobs-list'>{jobs_html}</ul></div>"
+                
+                # 🎯 إدراج الإجمالي في تصميم الوردية
+                html_content += f"<div class='shift-box'><span class='shift-name'><span>📍 {shift}</span><span class='shift-total-badge'>العدد: {shift_total}</span></span><ul class='jobs-list'>{jobs_html}</ul></div>"
             html_content += "</div></div>"
 
-        absent_html = f"<div class='grand-summary' style='border-color: var(--danger);'><h2 style='color: var(--danger);'>🚨 سجل الغياب الميداني التفصيلي</h2>"
+        # 5. قسم الغياب التفصيلي (يعرض كافة الورديات مفصلة ومرتبة)
+        absent_html = f"<div class='grand-summary' style='border-color: var(--danger);'><h2 style='color: var(--danger);'>🚨 سجل الغياب الميداني التفصيلي لكافة الورديات</h2>"
         has_absentees = False
 
         for company in df['operatorCompanyName'].unique():
@@ -239,9 +249,10 @@ def generate_master_dashboard():
                         has_absentees = True
                         absent_rows += f"<tr><td>{row.get('clean_name')}</td><td>{nid}</td><td>{row.get('occupationName')}</td><td>{row.get('clean_dept')}</td></tr>"
                 
+                # 🎯 يعرض الغياب مفصول ومقسم حسب الوردية
                 if absent_count > 0:
                     comp_absent_html += f"""
-                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 {shift} <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: {absent_count}</span></h3>
+                    <h3 style='color: var(--secondary); margin-top: 25px; border-right: 4px solid var(--danger); padding-right: 10px;'>📍 {shift} <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>إجمالي الغياب: {absent_count}</span></h3>
                     <table class='absent-table'>
                         <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
                         {absent_rows}
@@ -251,7 +262,7 @@ def generate_master_dashboard():
             if comp_absent_html:
                 absent_html += f"<div class='company-card' style='box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1); padding: 25px;'><div class='company-title' style='color: var(--danger); font-size: 1.5em; padding-bottom: 10px;'>🏢 {company}</div>{comp_absent_html}</div>"
 
-        absent_html += "</div>" if has_absentees else "<div class='grand-summary'><h2 style='color:#27ae60;'>✅ لا يوجد غياب مسجل حالياً.</h2></div>"
+        absent_html += "</div>" if has_absentees else f"<div class='grand-summary'><h2 style='color:#27ae60;'>✅ لا يوجد غياب مسجل لليوم.</h2></div>"
         
         html_content += absent_html
         
@@ -265,7 +276,6 @@ def generate_master_dashboard():
 
         with open(REPORT_PATH, "w", encoding="utf-8") as f:
             f.write(html_content)
-        print("✅ تم بناء لوحة البيانات المدمجة بنجاح!")
 
     except Exception as e:
         print(f"❌ حدث خطأ فني: {e}")
