@@ -1,15 +1,16 @@
-name: 🔄 تحديث بيانات الحج تلقائياً
+name: 🔄 التحديث التلقائي الشامل
 
 on:
   schedule:
     - cron: '0 */2 * * *' # يشتغل كل ساعتين
-  workflow_dispatch: # يسمح لك بتشغيله يدوياً
+  workflow_dispatch: # زر التشغيل اليدوي
 
 jobs:
-  build:
+  update-dashboard:
     runs-on: ubuntu-latest
+
     steps:
-      - name: 📥 سحب الكود من المستودع
+      - name: 📥 سحب ملفات المشروع
         uses: actions/checkout@v4
 
       - name: 🐍 إعداد بيئة بايثون
@@ -19,17 +20,18 @@ jobs:
 
       - name: 📦 تثبيت المكتبات اللازمة
         run: |
-          pip install requests pandas openpyxl
+          pip install requests pandas openpyxl selenium webdriver-manager
 
-      - name: 🚀 تشغيل كود سحب البيانات
+      - name: 🚀 تشغيل كود السحب والدمج
         env:
-          HAJJ_TOKEN: ${{ secrets.HAJJ_TOKEN }}
+          HAJJ_USER: ${{ secrets.HAJJ_USER }}
+          HAJJ_PASS: ${{ secrets.HAJJ_PASS }}
         run: python fetch_data.py
 
-      - name: 📤 رفع التحديثات إلى GitHub
+      - name: 📤 رفع التقرير الشامل للموقع
         run: |
-          git config --global user.name "GitHub-Actions-Bot"
-          git config --global user.email "actions@github.com"
-          git add index.html || echo "الملف غير موجود حالياً"
-          git commit -m "تحديث تلقائي للبيانات 🔄" || echo "لا توجد تغييرات للرفع"
-          git push origin main
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "action@github.com"
+          git add index.html
+          git commit -m "تحديث تلقائي شامل: إحصائيات + غياب 🕒" || echo "لا يوجد تغييرات للرفع"
+          git push
