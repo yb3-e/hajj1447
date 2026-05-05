@@ -1,671 +1,126 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #004d40; --secondary: #00796b; --accent: #c0a16b; --bg: #f4f7f6; }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: #2c3e50; }
-        .header { text-align: center; background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 60px 20px; border-radius: 30px; color: white; box-shadow: 0 15px 35px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
-        .eng-badge { position: relative; z-index: 2; display: inline-block; border: 2px solid var(--accent); padding: 12px 35px; border-radius: 15px; margin-bottom: 25px; background: rgba(0,0,0,0.3); }
-        .eng-badge .title { display: block; font-size: 1.2em; color: var(--accent); font-weight: 900; letter-spacing: 2px; }
-        .eng-badge .name { display: block; font-size: 1.8em; font-weight: 700; }
-        h1 { font-size: 2.8em; margin: 10px 0; position: relative; z-index: 2; text-shadow: 3px 3px 6px rgba(0,0,0,0.3); }
-        .live-indicator { background: rgba(255,255,255,0.15); padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 0.9em; display: inline-flex; align-items: center; gap: 10px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.3); }
-        .pulse { height: 12px; width: 12px; background-color: #4caf50; border-radius: 50%; display: inline-block; animation: pulse-animation 1.5s infinite; }
-        @keyframes pulse-animation { 0% { box-shadow: 0 0 0 0px rgba(76, 175, 80, 0.7); } 100% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); } }
-        .stats-container { display: flex; gap: 15px; justify-content: center; margin: -40px 0 50px; position: relative; z-index: 3; flex-wrap: wrap; }
-        .stat-card { background: white; padding: 20px 15px; border-radius: 20px; text-align: center; min-width: 160px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-bottom: 6px solid var(--accent); flex: 1; max-width: 200px; }
-        .stat-card b { display: block; font-size: 2.5em; color: var(--primary); line-height: 1.1; margin-bottom: 5px; }
-        .stat-card span { font-size: 0.95em; font-weight: 700; color: #7f8c8d; }
-        .company-card { background: white; padding: 35px; border-radius: 30px; margin-bottom: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
-        .company-title { font-size: 2em; color: var(--primary); border-bottom: 3px solid #f0f0f0; padding-bottom: 20px; margin-bottom: 25px; font-weight: 900; display: flex; justify-content: space-between; align-items: center; }
-        .company-badge { background: var(--accent); color: white; padding: 5px 15px; border-radius: 50px; font-size: 0.5em; font-weight: 700; }
-        .shift-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
-        .shift-box { background: #fafafa; border: 1px solid #eef2f3; padding: 25px; border-radius: 20px; }
-        .shift-name { color: var(--secondary); font-weight: 800; font-size: 1.3em; margin-bottom: 15px; border-right: 5px solid var(--accent); padding-right: 15px; }
-        .jobs-list { list-style: none; padding: 0; margin: 0; }
-        .jobs-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ddd; font-weight: 700; }
-        .job-val { background: var(--primary); color: white; padding: 3px 12px; border-radius: 8px; font-size: 0.9em; }
-        .grand-summary { background: #ffffff; border: 4px solid var(--primary); padding: 40px; border-radius: 40px; margin-top: 60px; }
-        .grand-summary h2 { text-align: center; color: var(--primary); font-size: 2.2em; margin-bottom: 35px; font-weight: 900; }
-        .grand-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .grand-item { background: #e0f2f1; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; border-right: 5px solid var(--primary); }
-        .footer { text-align: center; margin-top: 80px; padding: 50px; border-top: 2px solid #eee; color: #7f8c8d; }
-        .footer b { color: var(--primary); font-size: 1.5em; display: block; margin-top: 10px; font-family: 'Courier New', monospace; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <div class="eng-badge" dir="ltr">
-            <span class="title">Eng.</span>
-            <span class="name">Abdulaziz Alshehri</span>
-        </div>
-        <h1>التقرير الشامل لموسم حج 1447</h1>
-        <div class="live-indicator"><span class="pulse"></span>آخر تحديث للسيرفر: 10:53 PM</div>
-    </div>
+        <html lang="ar" dir="rtl">
+        <head>
+            <meta charset="UTF-8">
+            <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+            <style>
+                :root { --primary: #004d40; --secondary: #00796b; --accent: #c0a16b; --bg: #f4f7f6; --danger: #e74c3c; }
+                body { font-family: 'Cairo', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: #2c3e50; }
+                .header { text-align: center; background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 60px 20px; border-radius: 30px; color: white; box-shadow: 0 15px 35px rgba(0,0,0,0.2); position: relative; }
+                .eng-badge { display: inline-block; border: 2px solid var(--accent); padding: 12px 35px; border-radius: 15px; margin-bottom: 25px; background: rgba(0,0,0,0.3); }
+                .eng-badge .title { display: block; font-size: 1.2em; color: var(--accent); font-weight: 900; letter-spacing: 2px; }
+                .eng-badge .name { display: block; font-size: 1.8em; font-weight: 700; }
+                h1 { font-size: 2.5em; margin: 10px 0; }
+                .live-indicator { background: rgba(255,255,255,0.15); padding: 8px 20px; border-radius: 50px; font-weight: 700; display: inline-flex; align-items: center; gap: 10px; margin-top: 15px; }
+                .pulse { height: 12px; width: 12px; background-color: #4caf50; border-radius: 50%; animation: pulse-animation 1.5s infinite; }
+                @keyframes pulse-animation { 0% { box-shadow: 0 0 0 0px rgba(76, 175, 80, 0.7); } 100% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); } }
+                .stats-container { display: flex; gap: 15px; justify-content: center; margin: -40px 0 50px; flex-wrap: wrap; position: relative; }
+                .stat-card { background: white; padding: 20px 15px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-bottom: 6px solid var(--accent); flex: 1; min-width: 150px; max-width: 200px; }
+                .stat-card b { display: block; font-size: 2.5em; color: var(--primary); margin-bottom: 5px; }
+                .stat-card span { font-size: 0.95em; font-weight: 700; color: #7f8c8d; }
+                .company-card { background: white; padding: 35px; border-radius: 30px; margin-bottom: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
+                .company-title { font-size: 2em; color: var(--primary); border-bottom: 3px solid #f0f0f0; padding-bottom: 20px; margin-bottom: 25px; font-weight: 900; }
+                .shift-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+                .shift-box { background: #fafafa; border: 1px solid #eef2f3; padding: 25px; border-radius: 20px; }
+                .shift-name { color: var(--secondary); font-weight: 800; font-size: 1.3em; margin-bottom: 15px; display: block; border-right: 5px solid var(--accent); padding-right: 15px; }
+                .jobs-list { list-style: none; padding: 0; margin: 0; }
+                .jobs-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ddd; font-weight: 700; }
+                .job-val { background: var(--primary); color: white; padding: 3px 12px; border-radius: 8px; }
+                .grand-summary { background: #ffffff; border: 4px solid var(--primary); padding: 40px; border-radius: 40px; margin-top: 60px; }
+                .grand-summary h2 { text-align: center; color: var(--primary); font-size: 2.2em; margin-bottom: 35px; font-weight: 900; }
+                .absent-table { width: 100%; border-collapse: collapse; text-align: right; margin-top: 15px; font-size: 14px; }
+                .absent-table th { background: #f9ebec; color: var(--danger); padding: 12px; }
+                .absent-table td { padding: 10px; border-bottom: 1px solid #eee; }
+                .footer { text-align: center; margin-top: 80px; padding: 50px; color: #7f8c8d; font-family: 'Courier New', monospace; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="eng-badge" dir="ltr"><span class="title">Eng.</span><span class="name">Abdulaziz Alshehri</span></div>
+                <h1>التقرير الشامل لموسم حج 1447</h1>
+                <div class="live-indicator"><span class="pulse"></span>آخر تحديث تلقائي: 2026-05-05 03:11 AM</div>
+            </div>
 
-    <div class="stats-container">
-        <div class="stat-card"><b>1589</b><span>إجمالي الفعالين</span></div>
-        <div class="stat-card"><b>174</b><span>موظفين دائمين</span></div>
-        <div class="stat-card"><b>1404</b><span>موظفين موسميين</span></div>
-        <div class="stat-card"><b>8</b><span>الشركات المشغلة</span></div>
-        <div class="stat-card"><b>11</b><span>إجمالي الورديات</span></div>
-    </div>
+            <div class="stats-container">
+                <div class="stat-card"><b>1591</b><span>إجمالي الفعالين</span></div>
+                <div class="stat-card"><b>174</b><span>موظفين دائمين</span></div>
+                <div class="stat-card"><b>1406</b><span>موظفين موسميين</span></div>
+                <div class="stat-card"><b>8</b><span>الشركات المشغلة</span></div>
+                <div class="stat-card"><b>11</b><span>الورديات المجدولة</span></div>
+            </div>
 
-    <div class="content">
+            <div class="content">
+                <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 إحصائيات الورديات والوظائف</h2>
+        <div class='company-card'><div class='company-title'>🏢 شركة العربة الفاخرة</div><div class='shift-grid'><div class='shift-box'><span class='shift-name'>📍 وردية الثالثة مساء</span><ul class='jobs-list'><li><span>منظم</span><span class='job-val'>40</span></li><li><span>خدمة العملاء</span><span class='job-val'>8</span></li><li><span>فني صيانة</span><span class='job-val'>8</span></li><li><span>توجيه وارشاد</span><span class='job-val'>7</span></li><li><span>منظم مهمات</span><span class='job-val'>7</span></li><li><span>مسؤول مبيعات</span><span class='job-val'>7</span></li><li><span>مشرف موقع</span><span class='job-val'>5</span></li><li><span>أخصائي موارد بشرية</span><span class='job-val'>3</span></li><li><span>مساعد مشرف وردية</span><span class='job-val'>3</span></li><li><span>مشرف صيانة</span><span class='job-val'>2</span></li><li><span>رئيس وردية</span><span class='job-val'>2</span></li><li><span>مشرف وردية</span><span class='job-val'>1</span></li><li><span>الرئيس التنفيذي</span><span class='job-val'>1</span></li><li><span>م جلوس نقطة فرز اجياد الخارجية</span><span class='job-val'>1</span></li><li><span>موظف موارد بشرية</span><span class='job-val'>1</span></li><li><span>م مسارات نقطة فرز اجياد الخارجية</span><span class='job-val'>1</span></li><li><span>مقدم خدمة</span><span class='job-val'>1</span></li><li><span>مشرف خدمة عملاء</span><span class='job-val'>1</span></li><li><span>خدمة عملاء ميداني</span><span class='job-val'>1</span></li><li><span>رئيس وردية مهمات</span><span class='job-val'>1</span></li><li><span>م خروج نقطة فرز اجياد الخارجية</span><span class='job-val'>1</span></li><li><span>فني قولف</span><span class='job-val'>1</span></li><li><span>نائب مشرف</span><span class='job-val'>1</span></li><li><span>مناوب عمليات ادارة الموارد</span><span class='job-val'>1</span></li><li><span>مشرف مسؤلي مبيعات</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 الوردية الثانية صباح</span><ul class='jobs-list'><li><span>منظم</span><span class='job-val'>32</span></li><li><span>توجيه وارشاد</span><span class='job-val'>10</span></li><li><span>فني صيانة</span><span class='job-val'>10</span></li><li><span>خدمة العملاء</span><span class='job-val'>6</span></li><li><span>مسؤول مبيعات</span><span class='job-val'>5</span></li><li><span>مشرف موقع</span><span class='job-val'>4</span></li><li><span>منظم مهمات</span><span class='job-val'>3</span></li><li><span>مساعد مشرف وردية</span><span class='job-val'>3</span></li><li><span>مشرف صيانة</span><span class='job-val'>3</span></li><li><span>أخصائي موارد بشرية</span><span class='job-val'>2</span></li><li><span>رئيس وردية</span><span class='job-val'>2</span></li><li><span>مقدم خدمة</span><span class='job-val'>2</span></li><li><span>مرشد مكاني</span><span class='job-val'>1</span></li><li><span>مسؤول ادارة مشروع</span><span class='job-val'>1</span></li><li><span>سائق</span><span class='job-val'>1</span></li><li><span>مشرف وردية</span><span class='job-val'>1</span></li><li><span>م خروج نقطة فرز اجياد الخارجية</span><span class='job-val'>1</span></li><li><span>م مسارات نقطة فرز اجياد الخارجية</span><span class='job-val'>1</span></li><li><span>رئيس وردية مهمات</span><span class='job-val'>1</span></li><li><span>مشرف مجموعة اجياد</span><span class='job-val'>1</span></li><li><span>مشرف عمال</span><span class='job-val'>1</span></li><li><span>مشرف تقنية</span><span class='job-val'>1</span></li><li><span>مشرف عام خدمات العلاء</span><span class='job-val'>1</span></li><li><span>أخصائية تسويق</span><span class='job-val'>1</span></li><li><span>مشرف مسؤلي مبيعات</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 الوردية الاولى ليلية</span><ul class='jobs-list'><li><span>منظم</span><span class='job-val'>36</span></li><li><span>خدمة العملاء</span><span class='job-val'>6</span></li><li><span>توجيه وارشاد</span><span class='job-val'>5</span></li><li><span>فني صيانة</span><span class='job-val'>5</span></li><li><span>منظم مهمات</span><span class='job-val'>4</span></li><li><span>سائق</span><span class='job-val'>4</span></li><li><span>مساعد مشرف وردية</span><span class='job-val'>4</span></li><li><span>مسؤول مبيعات</span><span class='job-val'>4</span></li><li><span>مشرف موقع</span><span class='job-val'>3</span></li><li><span>أخصائي موارد بشرية</span><span class='job-val'>2</span></li><li><span>مشرف وردية</span><span class='job-val'>2</span></li><li><span>مساعد فني</span><span class='job-val'>2</span></li><li><span>م جلوس نقطة فرز اجياد الخارجية</span><span class='job-val'>1</span></li><li><span>م دخول نقطة فرز اجياد الخارجية</span><span class='job-val'>1</span></li><li><span>مشرف مجموعة اجياد</span><span class='job-val'>1</span></li><li><span>مشرف مهمات</span><span class='job-val'>1</span></li><li><span>م خروج نقطة فرز اجياد الخارجية</span><span class='job-val'>1</span></li><li><span>مرشد مكاني</span><span class='job-val'>1</span></li><li><span>منظم موقع</span><span class='job-val'>1</span></li><li><span>رئيس وردية</span><span class='job-val'>1</span></li><li><span>مشرف صيانة</span><span class='job-val'>1</span></li><li><span>مشرف مسؤلي مبيعات</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 عمليات الموارد </span><ul class='jobs-list'><li><span>أخصائي موارد بشرية</span><span class='job-val'>2</span></li><li><span>موظف موارد بشرية</span><span class='job-val'>1</span></li><li><span>مسؤول موارد بشرية ع</span><span class='job-val'>1</span></li><li><span>رئيس قسم الموارد البشرية</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 وردية الإدارة</span><ul class='jobs-list'><li><span>مدير التشغيل</span><span class='job-val'>4</span></li><li><span>موظف موارد بشرية</span><span class='job-val'>1</span></li><li><span>أخصائي موارد بشرية</span><span class='job-val'>1</span></li><li><span>مدير الموارد البشرية</span><span class='job-val'>1</span></li><li><span>مسؤول موارد بشرية ك</span><span class='job-val'>1</span></li><li><span>مسؤول عمليات الموارد</span><span class='job-val'>1</span></li><li><span>أخصائية تسويق</span><span class='job-val'>1</span></li><li><span>مساعد الرئيس التنفيذي</span><span class='job-val'>1</span></li><li><span>المدير التنفيذي للتقنية</span><span class='job-val'>1</span></li><li><span>سكرتيرة رئيس العمليات</span><span class='job-val'>1</span></li><li><span>مدير الصيانة للعربات الكهربائية</span><span class='job-val'>1</span></li><li><span>اخصائية ادخال بيانات</span><span class='job-val'>1</span></li><li><span>الرئيس التنفيذي</span><span class='job-val'>1</span></li><li><span>محلل مالي</span><span class='job-val'>1</span></li><li><span>مدير إدارة الأمن والحشود</span><span class='job-val'>1</span></li><li><span>المدير المالي</span><span class='job-val'>1</span></li><li><span>مشرف مخزون مستودع</span><span class='job-val'>1</span></li><li><span>المدير الفني للصيانة</span><span class='job-val'>1</span></li><li><span>مشرف تقنية</span><span class='job-val'>1</span></li><li><span>مدير خدمة العملاء</span><span class='job-val'>1</span></li><li><span>عامل</span><span class='job-val'>1</span></li><li><span>مدير المشروع</span><span class='job-val'>1</span></li><li><span>مشرف منصة الحرمين</span><span class='job-val'>1</span></li><li><span>مشرف شؤون موظفین</span><span class='job-val'>1</span></li><li><span>مشرف مالي</span><span class='job-val'>1</span></li><li><span>محاسب</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 وردية القطار 10</span><ul class='jobs-list'><li><span>مقدم خدمة</span><span class='job-val'>1</span></li></ul></div></div></div><div class='company-card'><div class='company-title'>🏢 شركة بشري</div><div class='shift-grid'><div class='shift-box'><span class='shift-name'>📍 الوردية الثانية صباح</span><ul class='jobs-list'><li><span>سائق</span><span class='job-val'>95</span></li><li><span>منظم</span><span class='job-val'>31</span></li><li><span>عامل تبديل بطاريات</span><span class='job-val'>24</span></li><li><span>مشرف موقع</span><span class='job-val'>19</span></li><li><span>منظم عربات يدوية</span><span class='job-val'>18</span></li><li><span>عامل</span><span class='job-val'>16</span></li><li><span>خدمة العملاء</span><span class='job-val'>11</span></li><li><span>مرشد مكاني</span><span class='job-val'>9</span></li><li><span>مسؤول مبيعات</span><span class='job-val'>8</span></li><li><span>فني صيانة</span><span class='job-val'>3</span></li><li><span>مشرف خدمة عملاء</span><span class='job-val'>2</span></li><li><span>منظم حشود</span><span class='job-val'>2</span></li><li><span>مشرف سائقين</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 الوردية الاولى ليلية</span><ul class='jobs-list'><li><span>سائق</span><span class='job-val'>121</span></li><li><span>منظم</span><span class='job-val'>32</span></li><li><span>مشرف موقع</span><span class='job-val'>22</span></li><li><span>عامل تبديل بطاريات</span><span class='job-val'>18</span></li><li><span>منظم عربات يدوية</span><span class='job-val'>16</span></li><li><span>خدمة العملاء</span><span class='job-val'>12</span></li><li><span>مرشد مكاني</span><span class='job-val'>11</span></li><li><span>عامل</span><span class='job-val'>10</span></li><li><span>مسؤول مبيعات</span><span class='job-val'>5</span></li><li><span>توجيه وارشاد</span><span class='job-val'>3</span></li><li><span>خدمة عملاء ميداني</span><span class='job-val'>1</span></li><li><span>مساعد مشرف حشود</span><span class='job-val'>1</span></li><li><span>مشرف تنظيم حشود</span><span class='job-val'>1</span></li><li><span>مساعد مشرف وردية</span><span class='job-val'>1</span></li><li><span>مشرف سائقين</span><span class='job-val'>1</span></li><li><span>أمين صندوق</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 وردية الثالثة مساء</span><ul class='jobs-list'><li><span>سائق</span><span class='job-val'>159</span></li><li><span>منظم</span><span class='job-val'>37</span></li><li><span>عامل تبديل بطاريات</span><span class='job-val'>23</span></li><li><span>مشرف موقع</span><span class='job-val'>20</span></li><li><span>منظم عربات يدوية</span><span class='job-val'>17</span></li><li><span>مرشد مكاني</span><span class='job-val'>13</span></li><li><span>عامل</span><span class='job-val'>11</span></li><li><span>خدمة العملاء</span><span class='job-val'>10</span></li><li><span>مسؤول مبيعات</span><span class='job-val'>7</span></li><li><span>توجيه وارشاد</span><span class='job-val'>3</span></li><li><span>منظم حشود</span><span class='job-val'>2</span></li><li><span>خدمة عملاء ميداني</span><span class='job-val'>1</span></li><li><span>مشرف سائقين</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 الاولى حج12ص-12م</span><ul class='jobs-list'><li><span>عامل تبديل بطاريات</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 وردية القطار 10</span><ul class='jobs-list'><li><span>مشرف موقع</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍  الثانية للحج 8ص-8م</span><ul class='jobs-list'><li><span>سائق للادارة</span><span class='job-val'>2</span></li><li><span>عامل تبديل بطاريات</span><span class='job-val'>1</span></li><li><span>عامل</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 وردية الإدارة</span><ul class='jobs-list'><li><span>مشرف موقع</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 الثالثة حج04م-04ص</span><ul class='jobs-list'><li><span>عامل تبديل بطاريات</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 غير محدد</span><ul class='jobs-list'><li><span>سائق</span><span class='job-val'>15</span></li></ul></div></div></div><div class='company-card'><div class='company-title'>🏢 مؤسسة حسام الغامدي</div><div class='shift-grid'><div class='shift-box'><span class='shift-name'>📍 وردية الثالثة مساء</span><ul class='jobs-list'><li><span>دافع عربه</span><span class='job-val'>153</span></li><li><span>منظم</span><span class='job-val'>6</span></li><li><span>منظم عربات يدوية</span><span class='job-val'>3</span></li><li><span>مشرف موقع</span><span class='job-val'>1</span></li><li><span>مشرف كباتن</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 الوردية الثانية صباح</span><ul class='jobs-list'><li><span>دافع عربه</span><span class='job-val'>64</span></li><li><span>منظم عربات يدوية</span><span class='job-val'>3</span></li><li><span>منظم</span><span class='job-val'>3</span></li><li><span>مشرف موقع</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 الوردية الاولى ليلية</span><ul class='jobs-list'><li><span>دافع عربه</span><span class='job-val'>100</span></li><li><span>منظم</span><span class='job-val'>5</span></li><li><span>منظم عربات يدوية</span><span class='job-val'>2</span></li><li><span>مشرف كباتن</span><span class='job-val'>1</span></li></ul></div></div></div><div class='company-card'><div class='company-title'>🏢 مؤسسة عبدالحكيم</div><div class='shift-grid'><div class='shift-box'><span class='shift-name'>📍 وردية الثالثة مساء</span><ul class='jobs-list'><li><span>عامل</span><span class='job-val'>14</span></li><li><span>دافع عربه</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 الوردية الثانية صباح</span><ul class='jobs-list'><li><span>عامل</span><span class='job-val'>15</span></li><li><span>دافع عربه</span><span class='job-val'>3</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 الوردية الاولى ليلية</span><ul class='jobs-list'><li><span>عامل تبديل بطاريات</span><span class='job-val'>8</span></li><li><span>دافع عربه</span><span class='job-val'>4</span></li><li><span>عامل</span><span class='job-val'>2</span></li></ul></div></div></div><div class='company-card'><div class='company-title'>🏢 شركة المصري</div><div class='shift-grid'><div class='shift-box'><span class='shift-name'>📍 الوردية الاولى ليلية</span><ul class='jobs-list'><li><span>عامل</span><span class='job-val'>13</span></li><li><span>عامل تبديل بطاريات</span><span class='job-val'>2</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 وردية الثالثة مساء</span><ul class='jobs-list'><li><span>عامل</span><span class='job-val'>14</span></li><li><span>مشرف عمال</span><span class='job-val'>1</span></li></ul></div><div class='shift-box'><span class='shift-name'>📍 الوردية الثانية صباح</span><ul class='jobs-list'><li><span>عامل</span><span class='job-val'>14</span></li><li><span>عامل تبديل بطاريات</span><span class='job-val'>1</span></li></ul></div></div></div><div class='company-card'><div class='company-title'>🏢 شركة انقاذ</div><div class='shift-grid'><div class='shift-box'><span class='shift-name'>📍 وردية الثالثة مساء</span><ul class='jobs-list'><li><span>مسؤول مبيعات</span><span class='job-val'>1</span></li></ul></div></div></div><div class='company-card'><div class='company-title'>🏢 شركة وسام الحجاز</div><div class='shift-grid'><div class='shift-box'><span class='shift-name'>📍 غير محدد</span><ul class='jobs-list'><li><span>مشرف كباتن</span><span class='job-val'>1</span></li></ul></div></div></div><div class='grand-summary' style='border-color: var(--danger);'><h2 style='color: var(--danger);'>🚨 سجل الغياب الميداني التفصيلي</h2><div class='company-card' style='box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1); padding: 25px;'><div class='company-title' style='color: var(--danger); font-size: 1.5em; padding-bottom: 10px;'>🏢 شركة العربة الفاخرة</div>
+                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 وردية الثالثة مساء <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: 20</span></h3>
+                    <table class='absent-table'>
+                        <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
+                        <tr><td>عبدالله سلطان الزهراني</td><td>1163024233</td><td>منظم مهمات</td><td>ادارة المهمات</td></tr><tr><td>امال ظيف الله الغامدي</td><td>1118340429</td><td>توجيه وارشاد</td><td>ادارة التشغيل</td></tr><tr><td>رضا عبدالله العتيبي</td><td>1129771885</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>ابوبكر عمر بالبيد</td><td>1002501342</td><td>الرئيس التنفيذي</td><td>ادارة التشغيل</td></tr><tr><td>زيد محمد الهاشمي</td><td>1147427064</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>عزام  عبدالله مذكور</td><td>1128804257</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>فراس احمد الشريف</td><td>1159465895</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>هاشم هشام البركاتي</td><td>1150287967</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>عبد الله  حسن  الاسمري</td><td>1028928180</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>يحي كريشم المالكي</td><td>1068270527</td><td>مشرف موقع</td><td>ادارة التشغيل</td></tr><tr><td>عبدالعزيز عبدالله الشهري</td><td>1126415635</td><td>موظف موارد بشرية</td><td>ادارة الموارد البشرية</td></tr><tr><td>عبدالرحيم مبارك الشيخ</td><td>1067157329</td><td>مشرف موقع</td><td>ادارة التشغيل</td></tr><tr><td>أبراهيم  مسيفر المقاطي</td><td>1055483968</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>انس علي الشهري</td><td>1131455873</td><td>منظم مهمات</td><td>ادارة التشغيل</td></tr><tr><td>مسعد سعود العميري</td><td>1110071626</td><td>مناوب عمليات ادارة الموارد</td><td>ادارة الموارد البشرية</td></tr><tr><td>سارة عادل حميدان الشريف</td><td>1100669546</td><td>خدمة العملاء</td><td>إدارة خدمات العملاء</td></tr><tr><td>زياد  اسحاق خان</td><td>2201393291</td><td>مشرف موقع</td><td>ادارة التشغيل</td></tr><tr><td>سعيد  عمر  حامد محمد</td><td>2104710849</td><td>فني صيانة</td><td>ادارة الصيانه</td></tr><tr><td>اسماء ناصر سمكري</td><td>1002424057</td><td>توجيه وارشاد</td><td>ادارة التشغيل</td></tr><tr><td>احمد عبدالله الصاعدي</td><td>1076653383</td><td>مسؤول مبيعات</td><td>ادارة الماليه</td></tr>
+                    </table>
+                    
+                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 الوردية الثانية صباح <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: 14</span></h3>
+                    <table class='absent-table'>
+                        <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
+                        <tr><td>سلطانه مرضي الغامدي</td><td>1096041114</td><td>توجيه وارشاد</td><td>ادارة التشغيل</td></tr><tr><td>ماجد مساعد الزهراني</td><td>1027221272</td><td>مشرف موقع</td><td>ادارة التشغيل</td></tr><tr><td>تهاني   فالح</td><td>1131727313</td><td>خدمة العملاء</td><td>إدارة خدمات العملاء</td></tr><tr><td>ورد حمدان المالكي</td><td>1066302637</td><td>توجيه وارشاد</td><td>إدارة خدمات العملاء</td></tr><tr><td>اشواق حمدان المالكي</td><td>1084408457</td><td>مرشد مكاني</td><td>إدارة خدمات العملاء</td></tr><tr><td>ايمن عبدالله سندي</td><td>1008091793</td><td>مسؤول ادارة مشروع</td><td>إدارة المشاريع</td></tr><tr><td>محمد رزق الثبيتي</td><td>1082024306</td><td>أخصائي موارد بشرية</td><td>ادارة الموارد البشرية</td></tr><tr><td>نواف  مسعود المجنوني</td><td>1110885140</td><td>فني صيانة</td><td>ادارة التشغيل</td></tr><tr><td>غدير علي محمد الضيفي</td><td>2088161563</td><td>خدمة العملاء</td><td>إدارة خدمات العملاء</td></tr><tr><td>عايشة  عبدالناصر احمد</td><td>1097186207</td><td>توجيه وارشاد</td><td>ادارة التشغيل</td></tr><tr><td>نايف  عبدالعزيز  العلوني</td><td>1120352768</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>تركي جميل عبدالله</td><td>2218288633</td><td>فني صيانة</td><td>ادارة الصيانه</td></tr><tr><td>اسامة محمد شطا</td><td>1013913221</td><td>رئيس وردية</td><td>ادارة التشغيل</td></tr><tr><td>سعيد عبدالستار عبدالله أحمد</td><td>1093548616</td><td>مشرف مسؤلي مبيعات</td><td>ادارة الماليه</td></tr>
+                    </table>
+                    
+                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 الوردية الاولى ليلية <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: 13</span></h3>
+                    <table class='absent-table'>
+                        <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
+                        <tr><td>فيصل  عبد الرحمن السلمي</td><td>1095821185</td><td>منظم مهمات</td><td>ادارة التشغيل</td></tr><tr><td>دانه بدر العتيبي</td><td>1140255223</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>شعاع عوض العتيبي</td><td>1078838578</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>بشاير موسم العتيبي</td><td>1066826544</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>ريم  موسم العتيبي</td><td>1071884140</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>راضية احمد حسن</td><td>2543103465</td><td>خدمة العملاء</td><td>إدارة خدمات العملاء</td></tr><tr><td>غير متوفر</td><td>1109681385</td><td>منظم</td><td>غير متوفر</td></tr><tr><td>امل سعيد الزهراني</td><td>1041787472</td><td>أخصائي موارد بشرية</td><td>ادارة الموارد البشرية</td></tr><tr><td>حاتم مختار فلاته</td><td>2044650733</td><td>منظم</td><td>ادارة التشغيل</td></tr><tr><td>عبدالواحد حسن سندي</td><td>1058850197</td><td>مساعد مشرف وردية</td><td>ادارة التشغيل</td></tr><tr><td>وعد احمد عباس</td><td>1102766027</td><td>توجيه وارشاد</td><td>ادارة التشغيل</td></tr><tr><td>امجاد فهاد الحربي</td><td>1093530770</td><td>توجيه وارشاد</td><td>ادارة التشغيل</td></tr><tr><td>حسان عبدالرحمن المحمادي</td><td>1097625691</td><td>مشرف مسؤلي مبيعات</td><td>ادارة الماليه</td></tr>
+                    </table>
+                    
+                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 عمليات الموارد  <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: 5</span></h3>
+                    <table class='absent-table'>
+                        <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
+                        <tr><td>اسماعيل هاشم البركاتي</td><td>1063055550</td><td>موظف موارد بشرية</td><td>ادارة الموارد البشرية</td></tr><tr><td>شهد متعب الروقي</td><td>1086855127</td><td>أخصائي موارد بشرية</td><td>ادارة الموارد البشرية</td></tr><tr><td>نواف خالد حلواني</td><td>1125339703</td><td>أخصائي موارد بشرية</td><td>ادارة الموارد البشرية</td></tr><tr><td>ماجد عبدالعزيز الزهراني</td><td>1119757514</td><td>مسؤول موارد بشرية ع</td><td>ادارة الموارد البشرية</td></tr><tr><td>سلطان سعيد عطية الزهراني</td><td>1041787464</td><td>رئيس قسم الموارد البشرية</td><td>ادارة الموارد البشرية</td></tr>
+                    </table>
+                    
+                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 وردية الإدارة <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: 9</span></h3>
+                    <table class='absent-table'>
+                        <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
+                        <tr><td>رزان عبدالغني الغامدي</td><td>1100979036</td><td>موظف موارد بشرية</td><td>ادارة الموارد البشرية</td></tr><tr><td>مروج  عبدالله مبارك بخضر</td><td>1100764487</td><td>سكرتيرة رئيس العمليات</td><td>ادارة الموارد البشرية</td></tr><tr><td>عصام  فريد المداح</td><td>1013339328</td><td>مدير الموارد البشرية</td><td>ادارة الموارد البشرية</td></tr><tr><td>ثامر طلال المالكي</td><td>1100779709</td><td>مسؤول موارد بشرية ك</td><td>ادارة الموارد البشرية</td></tr><tr><td>احمد سعيد عطية الزهراني</td><td>1017942721</td><td>مسؤول عمليات الموارد</td><td>ادارة الموارد البشرية</td></tr><tr><td>سيف منصور الكثيري</td><td>1030772121</td><td>الرئيس التنفيذي</td><td>ادارة التشغيل</td></tr><tr><td>محمود اكرم  هتريه</td><td>2282527593</td><td>المدير المالي</td><td>ادارة الماليه</td></tr><tr><td>عرفات  ذياب إبراهيم  الخواجا</td><td>2523802755</td><td>مشرف تقنية</td><td>ادارة الصيانه</td></tr><tr><td>شاجان عزيز عزيز</td><td>2300786635</td><td>عامل</td><td>ادارة الصيانه</td></tr>
+                    </table>
+                    </div><div class='company-card' style='box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1); padding: 25px;'><div class='company-title' style='color: var(--danger); font-size: 1.5em; padding-bottom: 10px;'>🏢 شركة بشري</div>
+                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 غير محدد <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: 15</span></h3>
+                    <table class='absent-table'>
+                        <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
+                        <tr><td>شمال  محمد  حسين</td><td>2124235488</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>خالد  خليل  احمد</td><td>2198580413</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>ماجد  ممتاز  احمد</td><td>2243057524</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>عمرو  عبدالروؤف  عبدالرحيم</td><td>2169095706</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>عبدالرحمن  محمد  يونس</td><td>2342756265</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>خالد   محمد صديق</td><td>2081187789</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>عمر  محمد  جلال</td><td>2089195701</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>عبدالله عبدالرؤوف عبدالرحيم</td><td>2161940297</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>مروان دل محمد ناظيم حسين</td><td>2132242740</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>عبدالله حسين احمد</td><td>2019677943</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>احمد صديق احمد رشيد</td><td>2083581971</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>ريان باشا نور احمد</td><td>2155747831</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>عبدالله محمد علي سفر علي</td><td>2012567125</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>عمر محمد حبيب الله</td><td>2141437273</td><td>سائق</td><td>ادارة التشغيل</td></tr><tr><td>عبدالرحمن يوسف قربان</td><td>2208372157</td><td>سائق</td><td>ادارة التشغيل</td></tr>
+                    </table>
+                    </div><div class='company-card' style='box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1); padding: 25px;'><div class='company-title' style='color: var(--danger); font-size: 1.5em; padding-bottom: 10px;'>🏢 مؤسسة حسام الغامدي</div>
+                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 الوردية الاولى ليلية <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: 3</span></h3>
+                    <table class='absent-table'>
+                        <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
+                        <tr><td>يوسف قحطان يحيى عائض دوده</td><td>2609609041</td><td>دافع عربه</td><td>ادارة التشغيل</td></tr><tr><td>حسين اسماعيل امير حسين</td><td>2194539090</td><td>دافع عربه</td><td>ادارة التشغيل</td></tr><tr><td>حسان امیر حسين</td><td>2427787045</td><td>دافع عربه</td><td>ادارة التشغيل</td></tr>
+                    </table>
+                    </div><div class='company-card' style='box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1); padding: 25px;'><div class='company-title' style='color: var(--danger); font-size: 1.5em; padding-bottom: 10px;'>🏢 مؤسسة عبدالحكيم</div>
+                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 وردية الثالثة مساء <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: 1</span></h3>
+                    <table class='absent-table'>
+                        <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
+                        <tr><td>Alam   Ali</td><td>2530874656</td><td>عامل</td><td>ادارة الصيانه</td></tr>
+                    </table>
+                    
+                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 الوردية الثانية صباح <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: 1</span></h3>
+                    <table class='absent-table'>
+                        <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
+                        <tr><td>Nurul   Amin</td><td>2600900936</td><td>عامل</td><td>ادارة الصيانه</td></tr>
+                    </table>
+                    </div><div class='company-card' style='box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1); padding: 25px;'><div class='company-title' style='color: var(--danger); font-size: 1.5em; padding-bottom: 10px;'>🏢 شركة انقاذ</div>
+                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 وردية الثالثة مساء <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: 1</span></h3>
+                    <table class='absent-table'>
+                        <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
+                        <tr><td>اختبار  البيع</td><td>1255550008</td><td>مسؤول مبيعات</td><td>ادارة الماليه</td></tr>
+                    </table>
+                    </div><div class='company-card' style='box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1); padding: 25px;'><div class='company-title' style='color: var(--danger); font-size: 1.5em; padding-bottom: 10px;'>🏢 شركة وسام الحجاز</div>
+                    <h3 style='color: var(--secondary); margin-top: 25px;'>📍 غير محدد <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>غياب: 1</span></h3>
+                    <table class='absent-table'>
+                        <tr><th>الاسم</th><th>الهوية</th><th>الوظيفة</th><th>القسم</th></tr>
+                        <tr><td>ريلض عبدالله العتيبي</td><td>1129771893</td><td>مشرف كباتن</td><td>ادارة التشغيل</td></tr>
+                    </table>
+                    </div></div>
+            <div class="footer" dir="ltr">
+                AUTOMATED SYSTEM PREPARED BY<br>
+                <b style="color: var(--primary); font-size: 1.5em;">Eng. Abdulaziz Alshehri</b>
+            </div>
+        </body></html>
         
-            <div class="company-card">
-                <div class="company-title">
-                    <span>🏢 شركة العربة الفاخرة</span>
-                    <span class="company-badge">العدد الكلي: 322</span>
-                </div>
-                <div class="shift-grid">
-                    
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية الثالثة مساء</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 106</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>منظم</span><span class="job-val">40</span></li>
-<li><span>خدمة العملاء</span><span class="job-val">8</span></li>
-<li><span>فني صيانة</span><span class="job-val">8</span></li>
-<li><span>توجيه وارشاد</span><span class="job-val">7</span></li>
-<li><span>منظم مهمات</span><span class="job-val">7</span></li>
-<li><span>مسؤول مبيعات</span><span class="job-val">7</span></li>
-<li><span>مشرف موقع</span><span class="job-val">5</span></li>
-<li><span>أخصائي موارد بشرية</span><span class="job-val">3</span></li>
-<li><span>مساعد مشرف وردية</span><span class="job-val">3</span></li>
-<li><span>مشرف صيانة</span><span class="job-val">2</span></li>
-<li><span>رئيس وردية</span><span class="job-val">2</span></li>
-<li><span>مشرف وردية</span><span class="job-val">1</span></li>
-<li><span>الرئيس التنفيذي</span><span class="job-val">1</span></li>
-<li><span>م جلوس نقطة فرز اجياد الخارجية</span><span class="job-val">1</span></li>
-<li><span>موظف موارد بشرية</span><span class="job-val">1</span></li>
-<li><span>م مسارات نقطة فرز اجياد الخارجية</span><span class="job-val">1</span></li>
-<li><span>مقدم خدمة</span><span class="job-val">1</span></li>
-<li><span>مشرف خدمة عملاء</span><span class="job-val">1</span></li>
-<li><span>خدمة عملاء ميداني</span><span class="job-val">1</span></li>
-<li><span>رئيس وردية مهمات</span><span class="job-val">1</span></li>
-<li><span>م خروج نقطة فرز اجياد الخارجية</span><span class="job-val">1</span></li>
-<li><span>فني قولف</span><span class="job-val">1</span></li>
-<li><span>نائب مشرف</span><span class="job-val">1</span></li>
-<li><span>مناوب عمليات ادارة الموارد</span><span class="job-val">1</span></li>
-<li><span>مشرف مسؤلي مبيعات</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الوردية الثانية صباح</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 95</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>منظم</span><span class="job-val">32</span></li>
-<li><span>توجيه وارشاد</span><span class="job-val">10</span></li>
-<li><span>فني صيانة</span><span class="job-val">10</span></li>
-<li><span>خدمة العملاء</span><span class="job-val">6</span></li>
-<li><span>مسؤول مبيعات</span><span class="job-val">5</span></li>
-<li><span>مشرف موقع</span><span class="job-val">4</span></li>
-<li><span>منظم مهمات</span><span class="job-val">3</span></li>
-<li><span>مساعد مشرف وردية</span><span class="job-val">3</span></li>
-<li><span>مشرف صيانة</span><span class="job-val">3</span></li>
-<li><span>أخصائي موارد بشرية</span><span class="job-val">2</span></li>
-<li><span>رئيس وردية</span><span class="job-val">2</span></li>
-<li><span>مقدم خدمة</span><span class="job-val">2</span></li>
-<li><span>مرشد مكاني</span><span class="job-val">1</span></li>
-<li><span>مسؤول ادارة مشروع</span><span class="job-val">1</span></li>
-<li><span>سائق</span><span class="job-val">1</span></li>
-<li><span>مشرف وردية</span><span class="job-val">1</span></li>
-<li><span>م خروج نقطة فرز اجياد الخارجية</span><span class="job-val">1</span></li>
-<li><span>م مسارات نقطة فرز اجياد الخارجية</span><span class="job-val">1</span></li>
-<li><span>رئيس وردية مهمات</span><span class="job-val">1</span></li>
-<li><span>مشرف مجموعة اجياد</span><span class="job-val">1</span></li>
-<li><span>مشرف عمال</span><span class="job-val">1</span></li>
-<li><span>مشرف تقنية</span><span class="job-val">1</span></li>
-<li><span>مشرف عام خدمات العلاء</span><span class="job-val">1</span></li>
-<li><span>أخصائية تسويق</span><span class="job-val">1</span></li>
-<li><span>مشرف مسؤلي مبيعات</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الوردية الاولى ليلية</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 86</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>منظم</span><span class="job-val">35</span></li>
-<li><span>خدمة العملاء</span><span class="job-val">6</span></li>
-<li><span>توجيه وارشاد</span><span class="job-val">5</span></li>
-<li><span>فني صيانة</span><span class="job-val">5</span></li>
-<li><span>منظم مهمات</span><span class="job-val">4</span></li>
-<li><span>سائق</span><span class="job-val">4</span></li>
-<li><span>مساعد مشرف وردية</span><span class="job-val">4</span></li>
-<li><span>مسؤول مبيعات</span><span class="job-val">4</span></li>
-<li><span>مشرف موقع</span><span class="job-val">3</span></li>
-<li><span>أخصائي موارد بشرية</span><span class="job-val">2</span></li>
-<li><span>مشرف وردية</span><span class="job-val">2</span></li>
-<li><span>مساعد فني</span><span class="job-val">2</span></li>
-<li><span>م جلوس نقطة فرز اجياد الخارجية</span><span class="job-val">1</span></li>
-<li><span>م دخول نقطة فرز اجياد الخارجية</span><span class="job-val">1</span></li>
-<li><span>مشرف مجموعة اجياد</span><span class="job-val">1</span></li>
-<li><span>مشرف مهمات</span><span class="job-val">1</span></li>
-<li><span>م خروج نقطة فرز اجياد الخارجية</span><span class="job-val">1</span></li>
-<li><span>مرشد مكاني</span><span class="job-val">1</span></li>
-<li><span>منظم موقع</span><span class="job-val">1</span></li>
-<li><span>رئيس وردية</span><span class="job-val">1</span></li>
-<li><span>مشرف صيانة</span><span class="job-val">1</span></li>
-<li><span>مشرف مسؤلي مبيعات</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 عمليات الموارد </span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 5</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>أخصائي موارد بشرية</span><span class="job-val">2</span></li>
-<li><span>موظف موارد بشرية</span><span class="job-val">1</span></li>
-<li><span>مسؤول موارد بشرية ع</span><span class="job-val">1</span></li>
-<li><span>رئيس قسم الموارد البشرية</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية الإدارة</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 29</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>مدير التشغيل</span><span class="job-val">4</span></li>
-<li><span>موظف موارد بشرية</span><span class="job-val">1</span></li>
-<li><span>أخصائي موارد بشرية</span><span class="job-val">1</span></li>
-<li><span>مدير الموارد البشرية</span><span class="job-val">1</span></li>
-<li><span>مسؤول موارد بشرية ك</span><span class="job-val">1</span></li>
-<li><span>مسؤول عمليات الموارد</span><span class="job-val">1</span></li>
-<li><span>أخصائية تسويق</span><span class="job-val">1</span></li>
-<li><span>مساعد الرئيس التنفيذي</span><span class="job-val">1</span></li>
-<li><span>المدير التنفيذي للتقنية</span><span class="job-val">1</span></li>
-<li><span>سكرتيرة رئيس العمليات </span><span class="job-val">1</span></li>
-<li><span>مدير الصيانة للعربات الكهربائية</span><span class="job-val">1</span></li>
-<li><span>اخصائية ادخال بيانات</span><span class="job-val">1</span></li>
-<li><span>الرئيس التنفيذي</span><span class="job-val">1</span></li>
-<li><span>محلل مالي</span><span class="job-val">1</span></li>
-<li><span>مدير إدارة الأمن والحشود</span><span class="job-val">1</span></li>
-<li><span>المدير المالي</span><span class="job-val">1</span></li>
-<li><span>مشرف مخزون مستودع</span><span class="job-val">1</span></li>
-<li><span>المدير الفني للصيانة</span><span class="job-val">1</span></li>
-<li><span>مشرف تقنية</span><span class="job-val">1</span></li>
-<li><span>مدير خدمة العملاء</span><span class="job-val">1</span></li>
-<li><span>عامل</span><span class="job-val">1</span></li>
-<li><span>مدير المشروع</span><span class="job-val">1</span></li>
-<li><span>مشرف منصة الحرمين</span><span class="job-val">1</span></li>
-<li><span>مشرف شؤون موظفین</span><span class="job-val">1</span></li>
-<li><span>مشرف مالي</span><span class="job-val">1</span></li>
-<li><span>محاسب</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية القطار 10</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 1</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>مقدم خدمة</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                </div>
-            </div>
-            <div class="company-card">
-                <div class="company-title">
-                    <span>🏢 شركة بشري</span>
-                    <span class="company-badge">العدد الكلي: 821</span>
-                </div>
-                <div class="shift-grid">
-                    
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الوردية الثانية صباح</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 239</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>سائق</span><span class="job-val">95</span></li>
-<li><span>منظم</span><span class="job-val">31</span></li>
-<li><span>عامل تبديل بطاريات</span><span class="job-val">24</span></li>
-<li><span>مشرف موقع</span><span class="job-val">19</span></li>
-<li><span>منظم عربات يدوية</span><span class="job-val">18</span></li>
-<li><span>عامل</span><span class="job-val">16</span></li>
-<li><span>خدمة العملاء</span><span class="job-val">11</span></li>
-<li><span>مرشد مكاني</span><span class="job-val">9</span></li>
-<li><span>مسؤول مبيعات</span><span class="job-val">8</span></li>
-<li><span>فني صيانة</span><span class="job-val">3</span></li>
-<li><span>مشرف خدمة عملاء</span><span class="job-val">2</span></li>
-<li><span>منظم حشود</span><span class="job-val">2</span></li>
-<li><span>مشرف سائقين </span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الوردية الاولى ليلية</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 255</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>سائق</span><span class="job-val">120</span></li>
-<li><span>منظم</span><span class="job-val">32</span></li>
-<li><span>مشرف موقع</span><span class="job-val">22</span></li>
-<li><span>عامل تبديل بطاريات</span><span class="job-val">18</span></li>
-<li><span>منظم عربات يدوية</span><span class="job-val">16</span></li>
-<li><span>خدمة العملاء</span><span class="job-val">12</span></li>
-<li><span>مرشد مكاني</span><span class="job-val">11</span></li>
-<li><span>عامل</span><span class="job-val">10</span></li>
-<li><span>مسؤول مبيعات</span><span class="job-val">5</span></li>
-<li><span>توجيه وارشاد</span><span class="job-val">3</span></li>
-<li><span>خدمة عملاء ميداني</span><span class="job-val">1</span></li>
-<li><span>مساعد مشرف حشود</span><span class="job-val">1</span></li>
-<li><span>مشرف تنظيم حشود</span><span class="job-val">1</span></li>
-<li><span>مساعد مشرف وردية</span><span class="job-val">1</span></li>
-<li><span>مشرف سائقين </span><span class="job-val">1</span></li>
-<li><span>أمين صندوق</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية الثالثة مساء</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 304</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>سائق</span><span class="job-val">159</span></li>
-<li><span>منظم</span><span class="job-val">37</span></li>
-<li><span>عامل تبديل بطاريات</span><span class="job-val">23</span></li>
-<li><span>مشرف موقع</span><span class="job-val">20</span></li>
-<li><span>منظم عربات يدوية</span><span class="job-val">17</span></li>
-<li><span>مرشد مكاني</span><span class="job-val">13</span></li>
-<li><span>عامل</span><span class="job-val">11</span></li>
-<li><span>خدمة العملاء</span><span class="job-val">10</span></li>
-<li><span>مسؤول مبيعات</span><span class="job-val">7</span></li>
-<li><span>توجيه وارشاد</span><span class="job-val">3</span></li>
-<li><span>منظم حشود</span><span class="job-val">2</span></li>
-<li><span>خدمة عملاء ميداني</span><span class="job-val">1</span></li>
-<li><span>مشرف سائقين </span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الاولى حج12ص-12م</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 1</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>عامل تبديل بطاريات</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية القطار 10</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 1</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>مشرف موقع</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍  الثانية للحج 8ص-8م</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 4</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>سائق للادارة</span><span class="job-val">2</span></li>
-<li><span>عامل تبديل بطاريات</span><span class="job-val">1</span></li>
-<li><span>عامل</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية الإدارة</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 1</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>مشرف موقع</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الثالثة حج04م-04ص</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 1</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>عامل تبديل بطاريات</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 غير محدد</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 15</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>سائق</span><span class="job-val">15</span></li>
-
-                    </ul>
-                </div>
-                </div>
-            </div>
-            <div class="company-card">
-                <div class="company-title">
-                    <span>🏢 مؤسسة حسام الغامدي</span>
-                    <span class="company-badge">العدد الكلي: 343</span>
-                </div>
-                <div class="shift-grid">
-                    
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية الثالثة مساء</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 164</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>دافع عربه</span><span class="job-val">153</span></li>
-<li><span>منظم</span><span class="job-val">6</span></li>
-<li><span>منظم عربات يدوية</span><span class="job-val">3</span></li>
-<li><span>مشرف موقع</span><span class="job-val">1</span></li>
-<li><span>مشرف كباتن</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الوردية الثانية صباح</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 71</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>دافع عربه</span><span class="job-val">64</span></li>
-<li><span>منظم عربات يدوية</span><span class="job-val">3</span></li>
-<li><span>منظم</span><span class="job-val">3</span></li>
-<li><span>مشرف موقع</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الوردية الاولى ليلية</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 108</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>دافع عربه</span><span class="job-val">100</span></li>
-<li><span>منظم</span><span class="job-val">5</span></li>
-<li><span>منظم عربات يدوية</span><span class="job-val">2</span></li>
-<li><span>مشرف كباتن</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                </div>
-            </div>
-            <div class="company-card">
-                <div class="company-title">
-                    <span>🏢 مؤسسة عبدالحكيم</span>
-                    <span class="company-badge">العدد الكلي: 47</span>
-                </div>
-                <div class="shift-grid">
-                    
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية الثالثة مساء</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 15</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>عامل</span><span class="job-val">14</span></li>
-<li><span>دافع عربه</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الوردية الثانية صباح</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 18</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>عامل</span><span class="job-val">15</span></li>
-<li><span>دافع عربه</span><span class="job-val">3</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الوردية الاولى ليلية</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 14</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>عامل تبديل بطاريات</span><span class="job-val">8</span></li>
-<li><span>دافع عربه</span><span class="job-val">4</span></li>
-<li><span>عامل</span><span class="job-val">2</span></li>
-
-                    </ul>
-                </div>
-                </div>
-            </div>
-            <div class="company-card">
-                <div class="company-title">
-                    <span>🏢 غير محدد</span>
-                    <span class="company-badge">العدد الكلي: 9</span>
-                </div>
-                <div class="shift-grid">
-                    
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية الثالثة مساء</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 1</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>منظم</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية اختبارية </span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 3</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>دافع عربه</span><span class="job-val">2</span></li>
-<li><span>مسؤول مبيعات</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الوردية الاولى ليلية</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 2</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>مسؤول مبيعات</span><span class="job-val">2</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 غير محدد</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 3</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>منظم</span><span class="job-val">2</span></li>
-<li><span>مسؤول مبيعات</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                </div>
-            </div>
-            <div class="company-card">
-                <div class="company-title">
-                    <span>🏢 شركة المصري </span>
-                    <span class="company-badge">العدد الكلي: 45</span>
-                </div>
-                <div class="shift-grid">
-                    
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الوردية الاولى ليلية</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 15</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>عامل</span><span class="job-val">13</span></li>
-<li><span>عامل تبديل بطاريات</span><span class="job-val">2</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية الثالثة مساء</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 15</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>عامل</span><span class="job-val">14</span></li>
-<li><span>مشرف عمال</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 الوردية الثانية صباح</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 15</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>عامل</span><span class="job-val">14</span></li>
-<li><span>عامل تبديل بطاريات</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                </div>
-            </div>
-            <div class="company-card">
-                <div class="company-title">
-                    <span>🏢 شركة انقاذ</span>
-                    <span class="company-badge">العدد الكلي: 1</span>
-                </div>
-                <div class="shift-grid">
-                    
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 وردية الثالثة مساء</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 1</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>مسؤول مبيعات</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                </div>
-            </div>
-            <div class="company-card">
-                <div class="company-title">
-                    <span>🏢 شركة وسام الحجاز</span>
-                    <span class="company-badge">العدد الكلي: 1</span>
-                </div>
-                <div class="shift-grid">
-                    
-                <div class="shift-box">
-                    <span class="shift-name" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>📍 غير محدد</span>
-                        <span style="background: var(--secondary); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75em; font-weight: bold;">العدد: 1</span>
-                    </span>
-                    <ul class="jobs-list">
-                        <li><span>مشرف كباتن</span><span class="job-val">1</span></li>
-
-                    </ul>
-                </div>
-                </div>
-            </div>
-    </div>
-
-    <div class="grand-summary">
-        <h2>📊 الملخص العام للوظائف (كافة الشركات)</h2>
-        <div class="grand-grid">
-            <div class="grand-item"><span>سائق</span><span class="job-val">394</span></div>
-<div class="grand-item"><span>دافع عربه</span><span class="job-val">327</span></div>
-<div class="grand-item"><span>منظم</span><span class="job-val">224</span></div>
-<div class="grand-item"><span>عامل</span><span class="job-val">111</span></div>
-<div class="grand-item"><span>عامل تبديل بطاريات</span><span class="job-val">79</span></div>
-<div class="grand-item"><span>مشرف موقع</span><span class="job-val">77</span></div>
-<div class="grand-item"><span>منظم عربات يدوية</span><span class="job-val">59</span></div>
-<div class="grand-item"><span>خدمة العملاء</span><span class="job-val">53</span></div>
-<div class="grand-item"><span>مسؤول مبيعات</span><span class="job-val">41</span></div>
-<div class="grand-item"><span>مرشد مكاني</span><span class="job-val">35</span></div>
-<div class="grand-item"><span>توجيه وارشاد</span><span class="job-val">28</span></div>
-<div class="grand-item"><span>فني صيانة</span><span class="job-val">26</span></div>
-<div class="grand-item"><span>منظم مهمات</span><span class="job-val">14</span></div>
-<div class="grand-item"><span>مساعد مشرف وردية</span><span class="job-val">11</span></div>
-<div class="grand-item"><span>أخصائي موارد بشرية</span><span class="job-val">10</span></div>
-<div class="grand-item"><span>مشرف صيانة</span><span class="job-val">6</span></div>
-<div class="grand-item"><span>رئيس وردية</span><span class="job-val">5</span></div>
-<div class="grand-item"><span>مدير التشغيل</span><span class="job-val">4</span></div>
-<div class="grand-item"><span>منظم حشود</span><span class="job-val">4</span></div>
-<div class="grand-item"><span>مقدم خدمة</span><span class="job-val">4</span></div>
-<div class="grand-item"><span>مشرف وردية</span><span class="job-val">4</span></div>
-<div class="grand-item"><span>موظف موارد بشرية</span><span class="job-val">3</span></div>
-<div class="grand-item"><span>خدمة عملاء ميداني</span><span class="job-val">3</span></div>
-<div class="grand-item"><span>مشرف مسؤلي مبيعات</span><span class="job-val">3</span></div>
-<div class="grand-item"><span>مشرف كباتن</span><span class="job-val">3</span></div>
-<div class="grand-item"><span>مشرف سائقين </span><span class="job-val">3</span></div>
-<div class="grand-item"><span>م خروج نقطة فرز اجياد الخارجية</span><span class="job-val">3</span></div>
-<div class="grand-item"><span>مشرف خدمة عملاء</span><span class="job-val">3</span></div>
-<div class="grand-item"><span>رئيس وردية مهمات</span><span class="job-val">2</span></div>
-<div class="grand-item"><span>مساعد فني</span><span class="job-val">2</span></div>
-<div class="grand-item"><span>أخصائية تسويق</span><span class="job-val">2</span></div>
-<div class="grand-item"><span>مشرف مجموعة اجياد</span><span class="job-val">2</span></div>
-<div class="grand-item"><span>سائق للادارة</span><span class="job-val">2</span></div>
-<div class="grand-item"><span>م جلوس نقطة فرز اجياد الخارجية</span><span class="job-val">2</span></div>
-<div class="grand-item"><span>م مسارات نقطة فرز اجياد الخارجية</span><span class="job-val">2</span></div>
-<div class="grand-item"><span>مشرف تقنية</span><span class="job-val">2</span></div>
-<div class="grand-item"><span>مشرف عمال</span><span class="job-val">2</span></div>
-<div class="grand-item"><span>الرئيس التنفيذي</span><span class="job-val">2</span></div>
-<div class="grand-item"><span>مسؤول عمليات الموارد</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>رئيس قسم الموارد البشرية</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مناوب عمليات ادارة الموارد</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>منظم موقع</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مسؤول موارد بشرية ع</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مشرف مهمات</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مدير الموارد البشرية</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مسؤول موارد بشرية ك</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مسؤول ادارة مشروع</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>سكرتيرة رئيس العمليات </span><span class="job-val">1</span></div>
-<div class="grand-item"><span>م دخول نقطة فرز اجياد الخارجية</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مساعد مشرف حشود</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مشرف تنظيم حشود</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مساعد الرئيس التنفيذي</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>المدير التنفيذي للتقنية</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مدير الصيانة للعربات الكهربائية</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>المدير المالي</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مدير إدارة الأمن والحشود</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>نائب مشرف</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>فني قولف</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>اخصائية ادخال بيانات</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>محلل مالي</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مشرف مخزون مستودع</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>المدير الفني للصيانة</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مشرف عام خدمات العلاء</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مدير خدمة العملاء</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مشرف منصة الحرمين</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مدير المشروع</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مشرف شؤون موظفین</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>أمين صندوق</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>مشرف مالي</span><span class="job-val">1</span></div>
-<div class="grand-item"><span>محاسب</span><span class="job-val">1</span></div>
-
-        </div>
-    </div>
-
-    <div class="footer" dir="ltr">
-        PREPARED BY<br>
-        <b>Eng. Abdulaziz Alshehri</b>
-    </div>
-</body>
-</html>
