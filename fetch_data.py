@@ -73,7 +73,6 @@ def get_hajj_token():
         if driver: driver.quit()
 
 def generate_master_dashboard():
-    # توقيت مكة المكرمة للتحديث
     current_time_str = datetime.now().strftime("%Y-%m-%d %I:%M %p")
     print(f"\n[{current_time_str}] 🚀 جاري بناء لوحة البيانات المدمجة...")
 
@@ -94,16 +93,22 @@ def generate_master_dashboard():
         except Exception as e:
             print(f"⚠️ تحذير الإكسيل: {e}")
 
-    # 2. سحب التوكن والبيانات
     token = get_hajj_token()
     if not token: 
         print("❌ لم يتم استخراج التوكن.")
         return
 
     headers = {"authorization": token, "content-type": "application/json", "lang": "ar"}
+    
+    # 🎯 هنا السر: الـ Payload الكامل اللي يرضي سيرفرهم ويجيب البيانات
     payload = {
-        "paging": {"sortField": "Id", "searchOrder": 2, "pageIndex": 1, "pageSize": 11000},
-        "data": {"searchText": "", "ActiveStatus": [True], "isDeleted": False}
+        "paging": {"sortField": "Id", "searchOrder": 2, "pageIndex": 1, "totalRowsCount": 10469, "totalPages": 1, "pageSize": 11000, "sortBy": "Id Desc"},
+        "data": {
+            "searchText": "", "name": "", "EmployeeId": None, "OccupationIds": [], "DepartmentIds": [], 
+            "SectionIds": [], "WorkShiftIds": [], "EmployeeTypes": [], "ManagerIds": [], 
+            "OperatorCompanyIds": [], "NationalIdExpired": [], "ActiveStatus": [True], 
+            "isPrinted": None, "isDeleted": False
+        }
     }
 
     try:
@@ -115,8 +120,10 @@ def generate_master_dashboard():
         present_ids = {str(x.get('employeeCode')).strip().lower() for x in att_data if isinstance(x, dict) and x.get('employeeCode')}
 
         if not all_employees:
-            print("🛑 لم يتم العثور على بيانات.")
+            print("🛑 لم يتم العثور على بيانات، تأكد من الرد حق السيرفر.")
             return
+
+        print(f"👥 تم سحب {len(all_employees)} موظف بنجاح!")
 
         # 3. دمج بيانات السيرفر مع الإكسيل
         for emp in all_employees:
@@ -134,7 +141,6 @@ def generate_master_dashboard():
         df = pd.DataFrame(all_employees)
         df = df.fillna('غير محدد')
 
-        # حساب الإحصائيات
         total_employees = len(df)
         total_companies = df['operatorCompanyName'].nunique()
         total_shifts = df['workShiftName'].nunique()
@@ -147,7 +153,6 @@ def generate_master_dashboard():
         permanent_count = len(df[df['mapped_type'] == 'دائم'])
         seasonal_count = len(df[df['mapped_type'] == 'موسمي'])
 
-        # --- بداية تصميم الـ HTML ---
         html_content = f"""<!DOCTYPE html>
         <html lang="ar" dir="rtl">
         <head>
@@ -178,7 +183,7 @@ def generate_master_dashboard():
                 .job-val {{ background: var(--primary); color: white; padding: 3px 12px; border-radius: 8px; }}
                 .grand-summary {{ background: #ffffff; border: 4px solid var(--primary); padding: 40px; border-radius: 40px; margin-top: 60px; }}
                 .grand-summary h2 {{ text-align: center; color: var(--primary); font-size: 2.2em; margin-bottom: 35px; font-weight: 900; }}
-                .absent-table {{ width: 100%; border-collapse: collapse; text-align: right; margin-top: 15px; }}
+                .absent-table {{ width: 100%; border-collapse: collapse; text-align: right; margin-top: 15px; font-size: 14px; }}
                 .absent-table th {{ background: #f9ebec; color: var(--danger); padding: 12px; }}
                 .absent-table td {{ padding: 10px; border-bottom: 1px solid #eee; }}
                 .footer {{ text-align: center; margin-top: 80px; padding: 50px; color: #7f8c8d; font-family: 'Courier New', monospace; }}
@@ -203,7 +208,6 @@ def generate_master_dashboard():
                 <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 إحصائيات الورديات والوظائف</h2>
         """
 
-        # 4. بناء إحصائيات الشركات والورديات
         for company in df['operatorCompanyName'].unique():
             if pd.isna(company) or company == 'غير محدد': continue
             html_content += f"<div class='company-card'><div class='company-title'>🏢 {company}</div><div class='shift-grid'>"
@@ -213,7 +217,6 @@ def generate_master_dashboard():
                 html_content += f"<div class='shift-box'><span class='shift-name'>📍 {shift}</span><ul class='jobs-list'>{jobs_html}</ul></div>"
             html_content += "</div></div>"
 
-        # 5. بناء قسم الغياب التفصيلي
         absent_html = f"<div class='grand-summary' style='border-color: var(--danger);'><h2 style='color: var(--danger);'>🚨 سجل الغياب الميداني التفصيلي</h2>"
         has_absentees = False
 
