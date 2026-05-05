@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REPORT_PATH = os.path.join(BASE_DIR, "index.html")
 EXCEL_PATH = os.path.join(BASE_DIR, "staff_data.xlsx") 
 
-USERNAME = os.getenv('HAJJ_USER'')
+USERNAME = os.getenv('HAJJ_USER')
 PASSWORD = os.getenv('HAJJ_PASS')
 
 def safe_extract_list(res_json):
