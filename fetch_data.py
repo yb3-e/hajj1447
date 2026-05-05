@@ -17,8 +17,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REPORT_PATH = os.path.join(BASE_DIR, "index.html")
 EXCEL_PATH = os.path.join(BASE_DIR, "staff_data.xlsx") 
 
-USERNAME = os.getenv('HAJJ_USER')
-PASSWORD = os.getenv('HAJJ_PASS')
+USERNAME = os.getenv('HAJJ_USER', 'E1126415635')
+PASSWORD = os.getenv('HAJJ_PASS', '415635')
 
 def safe_extract_list(res_json):
     if not res_json: return []
@@ -77,13 +77,16 @@ def generate_master_dashboard():
     current_time_str = makkah_time.strftime("%Y-%m-%d %I:%M %p")
     hour = makkah_time.hour
     
-    # تحديد الوردية الحالية للعرض في العنوان فقط
+    # تحديد الوردية الحالية بدقة للفلترة
     if 8 <= hour < 16:
-        active_shift = "الوردية الثانية (8ص - 4م)"
+        active_shift_key = "الوردية الثانية"
+        active_shift_title = "الوردية الثانية (8ص - 4م)"
     elif 16 <= hour < 24:
-        active_shift = "الوردية الثالثة (4م - 12ص)"
+        active_shift_key = "الوردية الثالثة"
+        active_shift_title = "الوردية الثالثة (4م - 12ص)"
     else:
-        active_shift = "الوردية الأولى (12ص - 8ص)"
+        active_shift_key = "الوردية الاولى"
+        active_shift_title = "الوردية الأولى (12ص - 8ص)"
 
     # 1. تجهيز قاعدة بيانات الإكسيل
     excel_db = {}
@@ -196,7 +199,7 @@ def generate_master_dashboard():
             <div class="header">
                 <div class="eng-badge" dir="ltr"><span class="title">Eng.</span><span class="name">Abdulaziz Alshehri</span></div>
                 <h1>التقرير الشامل لموسم حج 1447</h1>
-                <div style="font-size: 1.2em; margin-top: 10px; color: #e0f2f1;">الوقت الحالي بتوقيت مكة: {active_shift}</div>
+                <div style="font-size: 1.2em; margin-top: 10px; color: #e0f2f1;">متابعة ميدانية حية لـ: {active_shift_title}</div>
                 <div class="live-indicator"><span class="pulse"></span>آخر تحديث تلقائي: {current_time_str}</div>
             </div>
 
@@ -209,25 +212,24 @@ def generate_master_dashboard():
             </div>
 
             <div class="content">
-                <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 إحصائيات الورديات والوظائف</h2>
+                <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 إحصائيات الورديات والوظائف الشاملة</h2>
         """
 
-        # 4. بناء إحصائيات الشركات والورديات (مع إضافة إجمالي الموظفين لكل وردية)
+        # 4. الإحصائيات الشاملة لكل الورديات (تبقى كما هي لمعرفة التوزيع)
         for company in df['operatorCompanyName'].unique():
             if pd.isna(company) or company == 'غير محدد': continue
             html_content += f"<div class='company-card'><div class='company-title'>🏢 {company}</div><div class='shift-grid'>"
             for shift in df[df['operatorCompanyName']==company]['workShiftName'].unique():
                 shift_df = df[(df['operatorCompanyName']==company) & (df['workShiftName']==shift)]
-                shift_total = len(shift_df) # 🎯 هنا رجعنا حساب الإجمالي لكل وردية
+                shift_total = len(shift_df)
                 shift_jobs = shift_df['occupationName'].value_counts()
                 jobs_html = "".join([f"<li><span>{j}</span><span class='job-val'>{v}</span></li>" for j, v in shift_jobs.items()])
                 
-                # 🎯 إدراج الإجمالي في تصميم الوردية
                 html_content += f"<div class='shift-box'><span class='shift-name'><span>📍 {shift}</span><span class='shift-total-badge'>العدد: {shift_total}</span></span><ul class='jobs-list'>{jobs_html}</ul></div>"
             html_content += "</div></div>"
 
-        # 5. قسم الغياب التفصيلي (يعرض كافة الورديات مفصلة ومرتبة)
-        absent_html = f"<div class='grand-summary' style='border-color: var(--danger);'><h2 style='color: var(--danger);'>🚨 سجل الغياب الميداني التفصيلي لكافة الورديات</h2>"
+        # 5. 🎯 قسم الغياب الميداني (فلتر الوردية الحالية فقط)
+        absent_html = f"<div class='grand-summary' style='border-color: var(--danger);'><h2 style='color: var(--danger);'>🚨 سجل الغياب للوردية الحالية فقط ({active_shift_title})</h2>"
         has_absentees = False
 
         for company in df['operatorCompanyName'].unique():
@@ -236,6 +238,10 @@ def generate_master_dashboard():
             comp_absent_html = ""
             
             for shift in c_df['workShiftName'].unique():
+                # 🎯 الفلتر السحري: استبعاد أي وردية لا تتطابق مع الوردية الحالية
+                if active_shift_key not in str(shift):
+                    continue
+
                 shift_df = c_df[c_df['workShiftName'] == shift]
                 absent_rows = ""
                 absent_count = 0
@@ -249,7 +255,6 @@ def generate_master_dashboard():
                         has_absentees = True
                         absent_rows += f"<tr><td>{row.get('clean_name')}</td><td>{nid}</td><td>{row.get('occupationName')}</td><td>{row.get('clean_dept')}</td></tr>"
                 
-                # 🎯 يعرض الغياب مفصول ومقسم حسب الوردية
                 if absent_count > 0:
                     comp_absent_html += f"""
                     <h3 style='color: var(--secondary); margin-top: 25px; border-right: 4px solid var(--danger); padding-right: 10px;'>📍 {shift} <span style='color: white; background: var(--danger); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>إجمالي الغياب: {absent_count}</span></h3>
@@ -262,7 +267,7 @@ def generate_master_dashboard():
             if comp_absent_html:
                 absent_html += f"<div class='company-card' style='box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1); padding: 25px;'><div class='company-title' style='color: var(--danger); font-size: 1.5em; padding-bottom: 10px;'>🏢 {company}</div>{comp_absent_html}</div>"
 
-        absent_html += "</div>" if has_absentees else f"<div class='grand-summary'><h2 style='color:#27ae60;'>✅ لا يوجد غياب مسجل لليوم.</h2></div>"
+        absent_html += "</div>" if has_absentees else f"<div class='grand-summary'><h2 style='color:#27ae60; text-align:center;'>✅ لا يوجد غياب مسجل حالياً في ({active_shift_title}).</h2></div>"
         
         html_content += absent_html
         
