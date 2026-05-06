@@ -77,18 +77,18 @@ def generate_master_dashboard():
     current_time_str = makkah_time.strftime("%Y-%m-%d %I:%M %p")
     hour = makkah_time.hour
     
-    # تحديد الوردية الحالية بدقة للفلترة
+    # 🎯 الكلمات المفتاحية الذكية بناءً على المسميات الدقيقة في نظامكم
     if 8 <= hour < 16:
-        active_shift_key = "الوردية الثانية"
-        active_shift_title = "الوردية الثانية (8ص - 4م)"
+        shift_keywords = ["ثاني", "صباح", "2"]
+        active_shift_title = "الوردية الثانية صباح"
     elif 16 <= hour < 24:
-        active_shift_key = "الوردية الثالثة"
-        active_shift_title = "الوردية الثالثة (4م - 12ص)"
+        shift_keywords = ["ثالث", "مساء", "3"]
+        active_shift_title = "وردية الثالثة مساء"
     else:
-        active_shift_key = "الوردية الاولى"
-        active_shift_title = "الوردية الأولى (12ص - 8ص)"
+        shift_keywords = ["اول", "ليل", "1"]
+        active_shift_title = "الوردية الاولى ليلية"
 
-    # 1. تجهيز قاعدة بيانات الإكسيل (مع سحب أرقام الجوالات)
+    # 1. تجهيز قاعدة بيانات الإكسيل
     excel_db = {}
     if os.path.exists(EXCEL_PATH):
         try:
@@ -118,8 +118,6 @@ def generate_master_dashboard():
         return
 
     headers = {"authorization": token, "content-type": "application/json", "lang": "ar"}
-    
-    # 🎯 هنا تم إرجاع الـ Payload الطويل المدرع عشان السيرفر يرضى يعطينا البيانات!
     payload = {
         "paging": {"sortField": "Id", "searchOrder": 2, "pageIndex": 1, "totalRowsCount": 10469, "totalPages": 1, "pageSize": 11000, "sortBy": "Id Desc"},
         "data": {
@@ -139,7 +137,6 @@ def generate_master_dashboard():
         present_ids = {str(x.get('employeeCode')).strip().lower() for x in att_data if isinstance(x, dict) and x.get('employeeCode')}
 
         if not all_employees:
-            print("🛑 لم يتم العثور على بيانات، السيرفر رجع قائمة فارغة.")
             return
 
         for emp in all_employees:
@@ -173,14 +170,14 @@ def generate_master_dashboard():
         permanent_count = len(df[df['mapped_type'] == 'دائم'])
         seasonal_count = len(df[df['mapped_type'] == 'موسمي'])
 
-        # --- بداية التصميم (CSS المحدث قليلاً ليدعم القائمة المنسدلة بدون تخريب القديم) ---
+        # --- بداية التصميم (HTML/CSS) ---
         html_content = f"""<!DOCTYPE html>
         <html lang="ar" dir="rtl">
         <head>
             <meta charset="UTF-8">
             <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
             <style>
-                :root {{ --primary: #004d40; --secondary: #00796b; --accent: #c0a16b; --bg: #f4f7f6; --danger: #e74c3c; }}
+                :root {{ --primary: #004d40; --secondary: #00796b; --accent: #c0a16b; --bg: #f4f7f6; --danger: #e74c3c; --success: #27ae60; }}
                 body {{ font-family: 'Cairo', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: #2c3e50; }}
                 .header {{ text-align: center; background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 60px 20px; border-radius: 30px; color: white; box-shadow: 0 15px 35px rgba(0,0,0,0.2); position: relative; }}
                 .eng-badge {{ display: inline-block; border: 2px solid var(--accent); padding: 12px 35px; border-radius: 15px; margin-bottom: 25px; background: rgba(0,0,0,0.3); }}
@@ -194,17 +191,16 @@ def generate_master_dashboard():
                 .stat-card {{ background: white; padding: 20px 15px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-bottom: 6px solid var(--accent); flex: 1; min-width: 150px; max-width: 200px; }}
                 .stat-card b {{ display: block; font-size: 2.5em; color: var(--primary); margin-bottom: 5px; }}
                 .stat-card span {{ font-size: 0.95em; font-weight: 700; color: #7f8c8d; }}
-                .company-card {{ background: white; padding: 35px; border-radius: 30px; margin-bottom: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); }}
+                .company-card {{ background: white; padding: 35px; border-radius: 30px; margin-bottom: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); border: 1px solid #eee; }}
                 .company-title {{ font-size: 2em; color: var(--primary); border-bottom: 3px solid #f0f0f0; padding-bottom: 20px; margin-bottom: 25px; font-weight: 900; }}
                 .shift-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }}
                 .shift-box {{ background: #fafafa; border: 1px solid #eef2f3; padding: 25px; border-radius: 20px; }}
                 .shift-name {{ color: var(--secondary); font-weight: 800; font-size: 1.3em; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-right: 5px solid var(--accent); padding-right: 15px; }}
                 .shift-total-badge {{ font-size: 0.75em; background: #e0f2f1; color: var(--primary); padding: 5px 12px; border-radius: 12px; font-weight: 900; }}
                 .jobs-list {{ list-style: none; padding: 0; margin: 0; }}
-                /* تعديلات التوسعة (Dropdown) بدون مساس بالجمالية القديمة */
                 .jobs-list li {{ display: block; padding: 10px 0; border-bottom: 1px dashed #ddd; font-weight: 700; }}
                 .job-summary {{ display: flex; justify-content: space-between; align-items: center; cursor: pointer; list-style: none; outline: none; }}
-                .job-summary::-webkit-details-marker {{ display: none; }} /* إخفاء سهم المتصفح الافتراضي */
+                .job-summary::-webkit-details-marker {{ display: none; }}
                 .job-val {{ background: var(--primary); color: white; padding: 3px 12px; border-radius: 8px; font-family: monospace; font-size: 1.1em; }}
                 .emp-details-list {{ margin-top: 12px; padding: 15px; background: rgba(0, 77, 64, 0.04); border-radius: 10px; border-right: 4px solid var(--accent); font-size: 0.85em; list-style: none; }}
                 .emp-details-list li {{ display: flex; flex-direction: column; gap: 5px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); color: #2c3e50; font-weight: 600; border-bottom-style: solid; }}
@@ -217,6 +213,7 @@ def generate_master_dashboard():
                 .absent-table th {{ background: #f9ebec; color: var(--danger); padding: 12px; }}
                 .absent-table td {{ padding: 10px; border-bottom: 1px solid #eee; }}
                 .footer {{ text-align: center; margin-top: 80px; padding: 50px; color: #7f8c8d; font-family: 'Courier New', monospace; }}
+                .zero-absent-msg {{ color: var(--success); font-weight: bold; text-align: right; margin-top: 5px; background: #e8f8f5; padding: 10px; border-radius: 8px; font-size: 0.9em; }}
             </style>
         </head>
         <body>
@@ -236,10 +233,10 @@ def generate_master_dashboard():
             </div>
 
             <div class="content">
-                <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 الإحصائيات الشاملة وبيانات الموظفين</h2>
+                <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 القوى العاملة (جميع الموظفين لكل الشركات)</h2>
         """
 
-        # 4. بناء القوائم المنسدلة لكل وظيفة (الميزة الجديدة 🚀)
+        # --- 4. القسم العلوي: جميع الموظفين لكل الشركات (يظل كما هو بطلبك) ---
         for company in df['operatorCompanyName'].unique():
             if pd.isna(company) or company == 'غير محدد': continue
             html_content += f"<div class='company-card'><div class='company-title'>🏢 {company}</div><div class='shift-grid'>"
@@ -252,48 +249,40 @@ def generate_master_dashboard():
                 jobs_html = ""
                 for job_name, count in shift_jobs.items():
                     job_df = shift_df[shift_df['occupationName'] == job_name]
-                    
-                    # تجهيز قائمة أسماء الموظفين داخل هذي الوظيفة
                     emp_list_html = ""
                     for _, row in job_df.iterrows():
                         e_name = row.get('clean_name', 'غير متوفر')
                         e_id = str(row.get('nationalId', '')).replace('.0', '')
                         e_phone = row.get('clean_phone', 'لا يوجد رقم')
                         
-                        emp_list_html += f"""
-                        <li>
-                            <span class='emp-name'>👤 {e_name}</span>
-                            <span class='emp-meta'><span>💳 {e_id}</span> <span>📱 {e_phone}</span></span>
-                        </li>"""
+                        emp_list_html += f"<li><span class='emp-name'>👤 {e_name}</span><span class='emp-meta'><span>💳 {e_id}</span> <span>📱 {e_phone}</span></span></li>"
                     
-                    # بناء السهم والوظيفة باستخدام (details & summary)
-                    jobs_html += f"""
-                    <li>
-                        <details>
-                            <summary class='job-summary'>
-                                <span>{job_name}</span>
-                                <span class='job-val'>{count} ▾</span>
-                            </summary>
-                            <ul class='emp-details-list'>
-                                {emp_list_html}
-                            </ul>
-                        </details>
-                    </li>"""
+                    jobs_html += f"<li><details><summary class='job-summary'><span>{job_name}</span><span class='job-val'>{count} ▾</span></summary><ul class='emp-details-list'>{emp_list_html}</ul></details></li>"
                 
                 html_content += f"<div class='shift-box'><span class='shift-name'><span>📍 {shift}</span><span class='shift-total-badge'>العدد: {shift_total}</span></span><ul class='jobs-list'>{jobs_html}</ul></div>"
             html_content += "</div></div>"
 
-        # 5. قسم الغياب الميداني (يبقى ذكي ومحصور للوردية الحالية كما هو 🚨)
-        absent_html = f"<div class='grand-summary' style='border-color: var(--danger);'><h2 style='color: var(--danger);'>🚨 سجل الغياب للوردية الحالية فقط ({active_shift_title})</h2>"
-        has_absentees = False
+        # --- 5. قسم الغياب: ذكي وموثوق (يعرض كل الشركات الشغالة الآن) ---
+        absent_html = f"<div class='grand-summary' style='border-color: var(--danger);'><h2 style='color: var(--danger);'>🚨 سجل الغياب - {active_shift_title}</h2>"
+        has_any_shift_in_companies = False
 
         for company in df['operatorCompanyName'].unique():
             if pd.isna(company) or company == 'غير محدد': continue
             c_df = df[df['operatorCompanyName'] == company]
+            
             comp_absent_html = ""
+            company_has_active_shift = False
             
             for shift in c_df['workShiftName'].unique():
-                if active_shift_key not in str(shift): continue
+                # تنظيف النص ومطابقته بدقة مع كلمات الوردية
+                shift_clean = str(shift).replace('أ','ا').replace('إ','ا').replace('آ','ا').replace('ة','ه').strip().lower()
+                is_active = any(kw in shift_clean for kw in shift_keywords)
+
+                if not is_active:
+                    continue
+
+                company_has_active_shift = True
+                has_any_shift_in_companies = True
 
                 shift_df = c_df[c_df['workShiftName'] == shift]
                 absent_rows = ""
@@ -305,7 +294,6 @@ def generate_master_dashboard():
                     
                     if eid not in present_ids and nid not in present_ids:
                         absent_count += 1
-                        has_absentees = True
                         absent_rows += f"<tr><td>{row.get('clean_name')}</td><td>{nid}</td><td>{row.get('occupationName')}</td><td>{row.get('clean_dept')}</td></tr>"
                 
                 if absent_count > 0:
@@ -316,11 +304,22 @@ def generate_master_dashboard():
                         {absent_rows}
                     </table>
                     """
+                else:
+                    # 🎯 إذا لم يغب أحد، يكتب للريس بوضوح أن الشركة هذي تم تشييكها وغيابها صفر
+                    comp_absent_html += f"""
+                    <h3 style='color: var(--secondary); margin-top: 25px; border-right: 4px solid var(--success); padding-right: 10px;'>📍 {shift} <span style='color: white; background: var(--success); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>الغياب: صفر (0) ✅</span></h3>
+                    <div class='zero-absent-msg'>اكتمل حضور جميع الموظفين المجدولين في هذه الوردية.</div>
+                    """
             
-            if comp_absent_html:
-                absent_html += f"<div class='company-card' style='box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1); padding: 25px;'><div class='company-title' style='color: var(--danger); font-size: 1.5em; padding-bottom: 10px;'>🏢 {company}</div>{comp_absent_html}</div>"
+            # إذا الشركة عندها هذه الوردية، اطبع مربع الشركة سواء كان فيه غياب أو لا
+            if company_has_active_shift:
+                absent_html += f"<div class='company-card' style='box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 25px;'><div class='company-title' style='color: var(--primary); font-size: 1.5em; padding-bottom: 10px;'>🏢 {company}</div>{comp_absent_html}</div>"
 
-        absent_html += "</div>" if has_absentees else f"<div class='grand-summary'><h2 style='color:#27ae60; text-align:center;'>✅ لا يوجد غياب مسجل حالياً في ({active_shift_title}).</h2></div>"
+        # إذا الوقت الحالي ما فيه ولا شركة مبرمجة على هذي الوردية (نادر بس احتياط)
+        if not has_any_shift_in_companies:
+            absent_html += f"<h3 style='color:#7f8c8d; text-align:center; margin-top: 30px;'>لا توجد بيانات مسجلة لـ ({active_shift_title}) في جميع الشركات.</h3>"
+
+        absent_html += "</div>"
         
         html_content += absent_html
         
