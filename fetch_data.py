@@ -88,11 +88,19 @@ def generate_master_dashboard():
         active_shift_key = "الوردية الاولى"
         active_shift_title = "الوردية الأولى (12ص - 8ص)"
 
-    # 1. تجهيز قاعدة بيانات الإكسيل
+    # 1. تجهيز قاعدة بيانات الإكسيل (مع سحب أرقام الجوالات)
     excel_db = {}
     if os.path.exists(EXCEL_PATH):
         try:
             df_excel = pd.read_excel(EXCEL_PATH, dtype=str).fillna('غير متوفر')
+            
+            # البحث الذكي عن عمود رقم الجوال
+            phone_col = 'غير متوفر'
+            for col in ['رقم التليفون', 'رقم الجوال', 'الجوال', 'Phone', 'Mobile']:
+                if col in df_excel.columns:
+                    phone_col = col
+                    break
+
             for _, row in df_excel.iterrows():
                 n_id = str(row.get('هويه الموظف', '')).replace('.0', '').strip().lower()
                 if n_id and n_id != 'غير متوفر' and n_id != 'nan':
@@ -100,7 +108,8 @@ def generate_master_dashboard():
                         'name': str(row.get('اسم الموظف', 'غير متوفر')).strip(), 
                         'job': str(row.get('الوظيفه', 'غير متوفر')).strip(),
                         'dept': str(row.get('القسم', 'غير متوفر')).strip(),
-                        'company': str(row.get('شركة التشغيل', 'غير متوفر')).strip()
+                        'company': str(row.get('شركة التشغيل', 'غير متوفر')).strip(),
+                        'phone': str(row.get(phone_col, 'غير متوفر')).strip() if phone_col != 'غير متوفر' else 'غير متوفر'
                     }
         except Exception as e:
             pass
@@ -112,12 +121,7 @@ def generate_master_dashboard():
     headers = {"authorization": token, "content-type": "application/json", "lang": "ar"}
     payload = {
         "paging": {"sortField": "Id", "searchOrder": 2, "pageIndex": 1, "totalRowsCount": 10469, "totalPages": 1, "pageSize": 11000, "sortBy": "Id Desc"},
-        "data": {
-            "searchText": "", "name": "", "EmployeeId": None, "OccupationIds": [], "DepartmentIds": [], 
-            "SectionIds": [], "WorkShiftIds": [], "EmployeeTypes": [], "ManagerIds": [], 
-            "OperatorCompanyIds": [], "NationalIdExpired": [], "ActiveStatus": [True], 
-            "isPrinted": None, "isDeleted": False
-        }
+        "data": {"searchText": "", "ActiveStatus": [True], "isDeleted": False}
     }
 
     try:
@@ -133,15 +137,19 @@ def generate_master_dashboard():
 
         for emp in all_employees:
             nid = str(emp.get('nationalId', '')).replace('.0', '').strip().lower()
+            api_phone = emp.get('mobileNumber') or emp.get('phoneNumber') or 'لا يوجد رقم'
+            
             if nid in excel_db:
                 ex = excel_db[nid]
                 if ex['job'] not in ['غير متوفر', 'nan']: emp['occupationName'] = ex['job']
                 if ex['company'] not in ['غير متوفر', 'nan']: emp['operatorCompanyName'] = ex['company']
-                emp['clean_name'] = ex['name']
+                emp['clean_name'] = ex['name'] if ex['name'] not in ['غير متوفر', 'nan'] else (emp.get('name') or 'غير متوفر')
                 emp['clean_dept'] = ex['dept']
+                emp['clean_phone'] = ex['phone'] if ex['phone'] not in ['غير متوفر', 'nan'] else api_phone
             else:
                 emp['clean_name'] = emp.get('name') or 'غير متوفر'
                 emp['clean_dept'] = 'غير متوفر'
+                emp['clean_phone'] = api_phone
 
         df = pd.DataFrame(all_employees)
         df = df.fillna('غير محدد')
@@ -158,6 +166,7 @@ def generate_master_dashboard():
         permanent_count = len(df[df['mapped_type'] == 'دائم'])
         seasonal_count = len(df[df['mapped_type'] == 'موسمي'])
 
+        # --- بداية التصميم (CSS المحدث قليلاً ليدعم القائمة المنسدلة بدون تخريب القديم) ---
         html_content = f"""<!DOCTYPE html>
         <html lang="ar" dir="rtl">
         <head>
@@ -185,8 +194,16 @@ def generate_master_dashboard():
                 .shift-name {{ color: var(--secondary); font-weight: 800; font-size: 1.3em; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-right: 5px solid var(--accent); padding-right: 15px; }}
                 .shift-total-badge {{ font-size: 0.75em; background: #e0f2f1; color: var(--primary); padding: 5px 12px; border-radius: 12px; font-weight: 900; }}
                 .jobs-list {{ list-style: none; padding: 0; margin: 0; }}
-                .jobs-list li {{ display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ddd; font-weight: 700; }}
-                .job-val {{ background: var(--primary); color: white; padding: 3px 12px; border-radius: 8px; }}
+                /* تعديلات التوسعة (Dropdown) بدون مساس بالجمالية القديمة */
+                .jobs-list li {{ display: block; padding: 10px 0; border-bottom: 1px dashed #ddd; font-weight: 700; }}
+                .job-summary {{ display: flex; justify-content: space-between; align-items: center; cursor: pointer; list-style: none; outline: none; }}
+                .job-summary::-webkit-details-marker {{ display: none; }} /* إخفاء سهم المتصفح الافتراضي */
+                .job-val {{ background: var(--primary); color: white; padding: 3px 12px; border-radius: 8px; font-family: monospace; font-size: 1.1em; }}
+                .emp-details-list {{ margin-top: 12px; padding: 15px; background: rgba(0, 77, 64, 0.04); border-radius: 10px; border-right: 4px solid var(--accent); font-size: 0.85em; list-style: none; }}
+                .emp-details-list li {{ display: flex; flex-direction: column; gap: 5px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); color: #2c3e50; font-weight: 600; border-bottom-style: solid; }}
+                .emp-details-list li:last-child {{ border-bottom: none; padding-bottom: 0; }}
+                .emp-name {{ color: var(--primary); font-weight: 800; font-size: 1.1em; }}
+                .emp-meta {{ color: #7f8c8d; display: flex; justify-content: space-between; font-family: Tahoma, sans-serif; }}
                 .grand-summary {{ background: #ffffff; border: 4px solid var(--primary); padding: 40px; border-radius: 40px; margin-top: 60px; }}
                 .grand-summary h2 {{ text-align: center; color: var(--primary); font-size: 2.2em; margin-bottom: 35px; font-weight: 900; }}
                 .absent-table {{ width: 100%; border-collapse: collapse; text-align: right; margin-top: 15px; font-size: 14px; }}
@@ -212,23 +229,54 @@ def generate_master_dashboard():
             </div>
 
             <div class="content">
-                <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 إحصائيات الورديات والوظائف الشاملة</h2>
+                <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 الإحصائيات الشاملة وبيانات الموظفين</h2>
         """
 
-        # 4. الإحصائيات الشاملة لكل الورديات (تبقى كما هي لمعرفة التوزيع)
+        # 4. بناء القوائم المنسدلة لكل وظيفة (الميزة الجديدة 🚀)
         for company in df['operatorCompanyName'].unique():
             if pd.isna(company) or company == 'غير محدد': continue
             html_content += f"<div class='company-card'><div class='company-title'>🏢 {company}</div><div class='shift-grid'>"
+            
             for shift in df[df['operatorCompanyName']==company]['workShiftName'].unique():
                 shift_df = df[(df['operatorCompanyName']==company) & (df['workShiftName']==shift)]
                 shift_total = len(shift_df)
                 shift_jobs = shift_df['occupationName'].value_counts()
-                jobs_html = "".join([f"<li><span>{j}</span><span class='job-val'>{v}</span></li>" for j, v in shift_jobs.items()])
+                
+                jobs_html = ""
+                for job_name, count in shift_jobs.items():
+                    job_df = shift_df[shift_df['occupationName'] == job_name]
+                    
+                    # تجهيز قائمة أسماء الموظفين داخل هذي الوظيفة
+                    emp_list_html = ""
+                    for _, row in job_df.iterrows():
+                        e_name = row.get('clean_name', 'غير متوفر')
+                        e_id = str(row.get('nationalId', '')).replace('.0', '')
+                        e_phone = row.get('clean_phone', 'لا يوجد رقم')
+                        
+                        emp_list_html += f"""
+                        <li>
+                            <span class='emp-name'>👤 {e_name}</span>
+                            <span class='emp-meta'><span>💳 {e_id}</span> <span>📱 {e_phone}</span></span>
+                        </li>"""
+                    
+                    # بناء السهم والوظيفة باستخدام (details & summary)
+                    jobs_html += f"""
+                    <li>
+                        <details>
+                            <summary class='job-summary'>
+                                <span>{job_name}</span>
+                                <span class='job-val'>{count} ▾</span>
+                            </summary>
+                            <ul class='emp-details-list'>
+                                {emp_list_html}
+                            </ul>
+                        </details>
+                    </li>"""
                 
                 html_content += f"<div class='shift-box'><span class='shift-name'><span>📍 {shift}</span><span class='shift-total-badge'>العدد: {shift_total}</span></span><ul class='jobs-list'>{jobs_html}</ul></div>"
             html_content += "</div></div>"
 
-        # 5. 🎯 قسم الغياب الميداني (فلتر الوردية الحالية فقط)
+        # 5. قسم الغياب الميداني (يبقى ذكي ومحصور للوردية الحالية كما هو 🚨)
         absent_html = f"<div class='grand-summary' style='border-color: var(--danger);'><h2 style='color: var(--danger);'>🚨 سجل الغياب للوردية الحالية فقط ({active_shift_title})</h2>"
         has_absentees = False
 
@@ -238,9 +286,7 @@ def generate_master_dashboard():
             comp_absent_html = ""
             
             for shift in c_df['workShiftName'].unique():
-                # 🎯 الفلتر السحري: استبعاد أي وردية لا تتطابق مع الوردية الحالية
-                if active_shift_key not in str(shift):
-                    continue
+                if active_shift_key not in str(shift): continue
 
                 shift_df = c_df[c_df['workShiftName'] == shift]
                 absent_rows = ""
