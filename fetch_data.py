@@ -17,8 +17,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REPORT_PATH = os.path.join(BASE_DIR, "index.html")
 EXCEL_PATH = os.path.join(BASE_DIR, "staff_data.xlsx") 
 
-USERNAME = os.getenv('HAJJ_USER')
-PASSWORD = os.getenv('HAJJ_PASS')
+USERNAME = os.getenv('HAJJ_USER', 'E1126415635')
+PASSWORD = os.getenv('HAJJ_PASS', '415635')
 
 def safe_extract_list(res_json):
     if not res_json: return []
@@ -94,7 +94,6 @@ def generate_master_dashboard():
         try:
             df_excel = pd.read_excel(EXCEL_PATH, dtype=str).fillna('غير متوفر')
             
-            # البحث الذكي عن عمود رقم الجوال
             phone_col = 'غير متوفر'
             for col in ['رقم التليفون', 'رقم الجوال', 'الجوال', 'Phone', 'Mobile']:
                 if col in df_excel.columns:
@@ -119,9 +118,16 @@ def generate_master_dashboard():
         return
 
     headers = {"authorization": token, "content-type": "application/json", "lang": "ar"}
+    
+    # 🎯 هنا تم إرجاع الـ Payload الطويل المدرع عشان السيرفر يرضى يعطينا البيانات!
     payload = {
         "paging": {"sortField": "Id", "searchOrder": 2, "pageIndex": 1, "totalRowsCount": 10469, "totalPages": 1, "pageSize": 11000, "sortBy": "Id Desc"},
-        "data": {"searchText": "", "ActiveStatus": [True], "isDeleted": False}
+        "data": {
+            "searchText": "", "name": "", "EmployeeId": None, "OccupationIds": [], "DepartmentIds": [], 
+            "SectionIds": [], "WorkShiftIds": [], "EmployeeTypes": [], "ManagerIds": [], 
+            "OperatorCompanyIds": [], "NationalIdExpired": [], "ActiveStatus": [True], 
+            "isPrinted": None, "isDeleted": False
+        }
     }
 
     try:
@@ -133,6 +139,7 @@ def generate_master_dashboard():
         present_ids = {str(x.get('employeeCode')).strip().lower() for x in att_data if isinstance(x, dict) and x.get('employeeCode')}
 
         if not all_employees:
+            print("🛑 لم يتم العثور على بيانات، السيرفر رجع قائمة فارغة.")
             return
 
         for emp in all_employees:
