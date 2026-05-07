@@ -20,7 +20,7 @@ jobs:
 
       - name: 📦 تثبيت المكتبات اللازمة
         run: |
-          pip install requests pandas openpyxl selenium webdriver-manager
+          pip install requests pandas openpyxl selenium webdriver-manager run: pip install requests pandas openpyxl selenium undetected-chromedriver
 
       - name: 🚀 تشغيل كود السحب والدمج
         env:
