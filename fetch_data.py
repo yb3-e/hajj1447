@@ -37,26 +37,43 @@ def get_hajj_token():
         chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
+        # 🔥 خطوة التمويه: نتنكر كمتصفح كروم طبيعي عشان ما يصيدنا حماية الموقع
+        chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
         
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
+        print("🌐 جاري طلب الرابط...")
         driver.get("https://tnql-prod.sejeltech.app/")
-        time.sleep(10) 
-        if "404" in driver.current_url:
+        time.sleep(10)
+        
+        print(f"📍 الرابط اللي فتحه المتصفح: {driver.current_url}")
+        
+        if "404" in driver.current_url or "error" in driver.current_url.lower():
             try:
                 driver.find_element(By.XPATH, "//*[contains(text(), 'HOME')]").click()
                 time.sleep(5)
             except: pass
+
+        wait = WebDriverWait(driver, 30)
+        print("🔍 جاري البحث عن مربعات تسجيل الدخول...")
         
-        wait = WebDriverWait(driver, 40)
-        user_input = wait.until(EC.presence_of_element_located((By.XPATH, "(//input)[1]")))
-        pass_input = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='password']")))
+        try:
+            # وسعنا نطاق البحث عشان لو غيروا ترتيب المربعات
+            user_input = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text'] | (//input)[1]")))
+            pass_input = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='password']")))
+        except Exception as e:
+            print("⚠️ الكود ما قدر يشوف مربعات الدخول! هذي عينة من اللي يشوفه المتصفح الآن:")
+            # 🔥 هذا السطر بيطبع لنا كود الصفحة عشان نعرف إذا فيه رسالة حظر
+            print(driver.page_source[:1500]) 
+            raise e
         
         user_input.send_keys(USERNAME)
         pass_input.send_keys(PASSWORD)
         pass_input.send_keys(Keys.RETURN)
-        time.sleep(12) 
+        
+        print("⏳ جاري تسجيل الدخول وسحب التوكن...")
+        time.sleep(15) 
         
         token = driver.execute_script("return window.localStorage.getItem('token')") or \
                 next((v for k, v in driver.execute_script("return window.localStorage;").items() if str(v).startswith("eyJ")), None)
@@ -64,6 +81,8 @@ def get_hajj_token():
         if token:
             print("✅ [4/4] تم سحب التوكن الآلي بنجاح!")
             return f"Bearer {token}"
+            
+        print("❌ سجلنا دخول بس ما لقينا التوكن في الذاكرة!")
         return None
     except Exception as e:
         print(f"❌ خطأ المتصفح: {e}")
