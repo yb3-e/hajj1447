@@ -134,7 +134,25 @@ def generate_master_dashboard():
         
         r_att = requests.post("https://tnql-prod.sejeltech.app/api/EmployeeAttendanceMonitor/GetAttendance", headers=headers, json=payload)
         att_data = safe_extract_list(r_att.json())
-        present_ids = {str(x.get('employeeCode')).strip().lower() for x in att_data if isinstance(x, dict) and x.get('employeeCode')}
+        
+        # 🔥 الإضافة الجديدة: فلترة الحضور بناءً على تاريخ "اليوم" فقط
+        today_iso = makkah_time.strftime("%Y-%m-%d") # مثل: 2026-05-06
+        today_ar1 = makkah_time.strftime("%d/%m/%Y") # مثل: 06/05/2026
+        today_ar2 = f"{makkah_time.day}/{makkah_time.month}/{makkah_time.year}" # مثل: 6/5/2026
+
+        present_ids = set()
+        for x in att_data:
+            if isinstance(x, dict):
+                # تحويل السجل لنص عشان نبحث عن التاريخ بداخله
+                row_str = str(x.values()).lower()
+                
+                # إذا كانت البصمة تحتوي على تاريخ اليوم
+                if today_iso in row_str or today_ar1 in row_str or today_ar2 in row_str:
+                    # وإذا لم يكن مسجل يدوياً كـ "غائب"
+                    if "غائب" not in row_str and "absent" not in row_str:
+                        emp_code = x.get('employeeCode')
+                        if emp_code:
+                            present_ids.add(str(emp_code).strip().lower())
 
         if not all_employees:
             return
@@ -236,7 +254,7 @@ def generate_master_dashboard():
                 <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 القوى العاملة (جميع الموظفين لكل الشركات)</h2>
         """
 
-        # --- 4. القسم العلوي: جميع الموظفين لكل الشركات (يظل كما هو بطلبك) ---
+        # --- 4. القسم العلوي: جميع الموظفين لكل الشركات ---
         for company in df['operatorCompanyName'].unique():
             if pd.isna(company) or company == 'غير محدد': continue
             html_content += f"<div class='company-card'><div class='company-title'>🏢 {company}</div><div class='shift-grid'>"
@@ -262,7 +280,7 @@ def generate_master_dashboard():
                 html_content += f"<div class='shift-box'><span class='shift-name'><span>📍 {shift}</span><span class='shift-total-badge'>العدد: {shift_total}</span></span><ul class='jobs-list'>{jobs_html}</ul></div>"
             html_content += "</div></div>"
 
-        # --- 5. قسم الغياب: ذكي وموثوق (يعرض كل الشركات الشغالة الآن) ---
+        # --- 5. قسم الغياب: ذكي وموثوق بالوقت ---
         absent_html = f"<div class='grand-summary' style='border-color: var(--danger);'><h2 style='color: var(--danger);'>🚨 سجل الغياب - {active_shift_title}</h2>"
         has_any_shift_in_companies = False
 
@@ -274,7 +292,6 @@ def generate_master_dashboard():
             company_has_active_shift = False
             
             for shift in c_df['workShiftName'].unique():
-                # تنظيف النص ومطابقته بدقة مع كلمات الوردية
                 shift_clean = str(shift).replace('أ','ا').replace('إ','ا').replace('آ','ا').replace('ة','ه').strip().lower()
                 is_active = any(kw in shift_clean for kw in shift_keywords)
 
@@ -305,17 +322,14 @@ def generate_master_dashboard():
                     </table>
                     """
                 else:
-                    # 🎯 إذا لم يغب أحد، يكتب للريس بوضوح أن الشركة هذي تم تشييكها وغيابها صفر
                     comp_absent_html += f"""
                     <h3 style='color: var(--secondary); margin-top: 25px; border-right: 4px solid var(--success); padding-right: 10px;'>📍 {shift} <span style='color: white; background: var(--success); padding: 3px 10px; border-radius: 10px; font-size: 0.8em; margin-right: 10px;'>الغياب: صفر (0) ✅</span></h3>
                     <div class='zero-absent-msg'>اكتمل حضور جميع الموظفين المجدولين في هذه الوردية.</div>
                     """
             
-            # إذا الشركة عندها هذه الوردية، اطبع مربع الشركة سواء كان فيه غياب أو لا
             if company_has_active_shift:
                 absent_html += f"<div class='company-card' style='box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 25px;'><div class='company-title' style='color: var(--primary); font-size: 1.5em; padding-bottom: 10px;'>🏢 {company}</div>{comp_absent_html}</div>"
 
-        # إذا الوقت الحالي ما فيه ولا شركة مبرمجة على هذي الوردية (نادر بس احتياط)
         if not has_any_shift_in_companies:
             absent_html += f"<h3 style='color:#7f8c8d; text-align:center; margin-top: 30px;'>لا توجد بيانات مسجلة لـ ({active_shift_title}) في جميع الشركات.</h3>"
 
