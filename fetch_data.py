@@ -3,10 +3,8 @@ import os
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
+# 🔥 الاستدعاءات الجديدة الخاصة بالتخفي
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -17,8 +15,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REPORT_PATH = os.path.join(BASE_DIR, "index.html")
 EXCEL_PATH = os.path.join(BASE_DIR, "staff_data.xlsx") 
 
-USERNAME = os.getenv('HAJJ_USER')
-PASSWORD = os.getenv('HAJJ_PASS')
+USERNAME = os.getenv('HAJJ_USER', 'E1126415635')
+PASSWORD = os.getenv('HAJJ_PASS', '415635')
 
 def safe_extract_list(res_json):
     if not res_json: return []
@@ -32,16 +30,14 @@ def safe_extract_list(res_json):
 def get_hajj_token():
     driver = None
     try:
-        print("🌐 [1/4] جاري فتح المتصفح الخفي لسحب التوكن...")
-        chrome_options = Options()
-        chrome_options.add_argument("--headless=new")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        # 🔥 خطوة التمويه: نتنكر كمتصفح كروم طبيعي عشان ما يصيدنا حماية الموقع
-        chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+        print("🌐 [1/4] جاري فتح المتصفح (بوضع التخفي العميق)...")
+        # 🔥 إعدادات متصفح التخفي
+        options = uc.ChromeOptions()
+        options.add_argument("--headless=new")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
         
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = uc.Chrome(options=options)
         
         print("🌐 جاري طلب الرابط...")
         driver.get("https://tnql-prod.sejeltech.app/")
@@ -59,12 +55,10 @@ def get_hajj_token():
         print("🔍 جاري البحث عن مربعات تسجيل الدخول...")
         
         try:
-            # وسعنا نطاق البحث عشان لو غيروا ترتيب المربعات
             user_input = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text'] | (//input)[1]")))
             pass_input = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='password']")))
         except Exception as e:
-            print("⚠️ الكود ما قدر يشوف مربعات الدخول! هذي عينة من اللي يشوفه المتصفح الآن:")
-            # 🔥 هذا السطر بيطبع لنا كود الصفحة عشان نعرف إذا فيه رسالة حظر
+            print("⚠️ جدار الحماية لا زال يحجبنا! هذي عينة من الشاشة:")
             print(driver.page_source[:1500]) 
             raise e
         
@@ -94,9 +88,10 @@ def generate_master_dashboard():
     # 🎯 توقيت مكة المكرمة
     makkah_time = datetime.utcnow() + timedelta(hours=3)
     current_time_str = makkah_time.strftime("%Y-%m-%d %I:%M %p")
+    today_iso = makkah_time.strftime("%Y-%m-%d")
     hour = makkah_time.hour
     
-    # 🎯 الكلمات المفتاحية الذكية بناءً على المسميات الدقيقة
+    # تحديد الوردية الحالية
     if 8 <= hour < 16:
         shift_keywords = ["ثاني", "صباح", "2"]
         active_shift_title = "الوردية الثانية صباح"
@@ -112,81 +107,47 @@ def generate_master_dashboard():
     if os.path.exists(EXCEL_PATH):
         try:
             df_excel = pd.read_excel(EXCEL_PATH, dtype=str).fillna('غير متوفر')
-            
-            phone_col = 'غير متوفر'
-            for col in ['رقم التليفون', 'رقم الجوال', 'الجوال', 'Phone', 'Mobile']:
-                if col in df_excel.columns:
-                    phone_col = col
-                    break
-
+            phone_col = next((c for c in ['رقم التليفون', 'رقم الجوال', 'الجوال'] if c in df_excel.columns), 'غير متوفر')
             for _, row in df_excel.iterrows():
                 n_id = str(row.get('هويه الموظف', '')).replace('.0', '').strip().lower()
-                if n_id and n_id != 'غير متوفر' and n_id != 'nan':
+                if n_id and n_id not in ['غير متوفر', 'nan']:
                     excel_db[n_id] = {
-                        'name': str(row.get('اسم الموظف', 'غير متوفر')).strip(), 
+                        'name': str(row.get('اسم الموظف', 'غير متوفر')).strip(),
                         'job': str(row.get('الوظيفه', 'غير متوفر')).strip(),
-                        'dept': str(row.get('القسم', 'غير متوفر')).strip(),
                         'company': str(row.get('شركة التشغيل', 'غير متوفر')).strip(),
-                        'phone': str(row.get(phone_col, 'غير متوفر')).strip() if phone_col != 'غير متوفر' else 'غير متوفر'
+                        'phone': str(row.get(phone_col, 'غير متوفر')).strip()
                     }
-        except Exception as e:
-            pass
+        except Exception: pass
 
     token = get_hajj_token()
-    if not token: 
-        return
+    if not token: return
 
     headers = {"authorization": token, "content-type": "application/json", "lang": "ar"}
     payload = {
         "paging": {"sortField": "Id", "searchOrder": 2, "pageIndex": 1, "totalRowsCount": 10469, "totalPages": 1, "pageSize": 11000, "sortBy": "Id Desc"},
-        "data": {
-            "searchText": "", "name": "", "EmployeeId": None, "OccupationIds": [], "DepartmentIds": [], 
-            "SectionIds": [], "WorkShiftIds": [], "EmployeeTypes": [], "ManagerIds": [], 
-            "OperatorCompanyIds": [], "NationalIdExpired": [], "ActiveStatus": [True], 
-            "isPrinted": None, "isDeleted": False
-        }
+        "data": {"ActiveStatus": [True], "isDeleted": False}
     }
 
     try:
         r_emp = requests.post("https://tnql-prod.sejeltech.app/api/StaffMember/GetStaffMember", headers=headers, json=payload)
         all_employees = safe_extract_list(r_emp.json())
-        
         r_att = requests.post("https://tnql-prod.sejeltech.app/api/EmployeeAttendanceMonitor/GetAttendance", headers=headers, json=payload)
         att_data = safe_extract_list(r_att.json())
         
-        # 🔥 فلترة الحضور لتاريخ اليوم فقط
-        today_iso = makkah_time.strftime("%Y-%m-%d") 
-        today_ar1 = makkah_time.strftime("%d/%m/%Y") 
-        today_ar2 = f"{makkah_time.day}/{makkah_time.month}/{makkah_time.year}" 
-
-        present_ids = set()
-        for x in att_data:
-            if isinstance(x, dict):
-                row_str = str(x.values()).lower()
-                if today_iso in row_str or today_ar1 in row_str or today_ar2 in row_str:
-                    if "غائب" not in row_str and "absent" not in row_str:
-                        emp_code = x.get('employeeCode')
-                        if emp_code:
-                            present_ids.add(str(emp_code).strip().lower())
-
-        if not all_employees:
-            return
+        # فلترة الحضور لليوم فقط
+        present_ids = {str(x.get('employeeCode')).strip().lower() for x in att_data if isinstance(x, dict) and today_iso in str(x.values())}
 
         for emp in all_employees:
             nid = str(emp.get('nationalId', '')).replace('.0', '').strip().lower()
-            api_phone = emp.get('mobileNumber') or emp.get('phoneNumber') or 'لا يوجد رقم'
-            
             if nid in excel_db:
                 ex = excel_db[nid]
-                if ex['job'] not in ['غير متوفر', 'nan']: emp['occupationName'] = ex['job']
-                if ex['company'] not in ['غير متوفر', 'nan']: emp['operatorCompanyName'] = ex['company']
-                emp['clean_name'] = ex['name'] if ex['name'] not in ['غير متوفر', 'nan'] else (emp.get('name') or 'غير متوفر')
-                emp['clean_dept'] = ex['dept']
-                emp['clean_phone'] = ex['phone'] if ex['phone'] not in ['غير متوفر', 'nan'] else api_phone
+                emp['occupationName'] = ex['job'] if ex['job'] != 'غير متوفر' else emp.get('occupationName')
+                emp['operatorCompanyName'] = ex['company'] if ex['company'] != 'غير متوفر' else emp.get('operatorCompanyName')
+                emp['clean_name'] = ex['name']
+                emp['clean_phone'] = ex['phone']
             else:
-                emp['clean_name'] = emp.get('name') or 'غير متوفر'
-                emp['clean_dept'] = 'غير متوفر'
-                emp['clean_phone'] = api_phone
+                emp['clean_name'] = emp.get('name')
+                emp['clean_phone'] = emp.get('mobileNumber', 'غير متوفر')
 
         df = pd.DataFrame(all_employees)
         df = df.fillna('غير محدد')
@@ -273,7 +234,6 @@ def generate_master_dashboard():
                 <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 القوى العاملة (جميع الموظفين لكل الشركات)</h2>
         """
 
-        # --- 4. القسم العلوي: جميع الموظفين لكل الشركات (بالتفصيل القديم اللي يعجبك) ---
         for company in df['operatorCompanyName'].unique():
             if pd.isna(company) or company == 'غير محدد': continue
             html_content += f"<div class='company-card'><div class='company-title'>🏢 {company}</div><div class='shift-grid'>"
@@ -299,7 +259,6 @@ def generate_master_dashboard():
                 html_content += f"<div class='shift-box'><span class='shift-name'><span>📍 {shift}</span><span class='shift-total-badge'>العدد: {shift_total}</span></span><ul class='jobs-list'>{jobs_html}</ul></div>"
             html_content += "</div></div>"
 
-        # --- 4.5 الإضافة الجديدة: الإجمالي العام للوظائف (لكافة الشركات) ---
         total_job_counts = df['occupationName'].value_counts()
         jobs_summary_html = "<div class='grand-summary' style='padding: 30px; margin-bottom: 40px;'><h2 style='text-align:center; color:var(--primary); font-size: 2em; margin-bottom: 25px;'>📊 الإجمالي الشامل للوظائف (كافة الشركات)</h2><div class='grand-grid'>"
         for j, v in total_job_counts.items():
@@ -308,9 +267,7 @@ def generate_master_dashboard():
         
         html_content += jobs_summary_html
 
-        # --- 5. قسم الغياب: ذكي وموثوق بالوقت + زر الإكسيل ---
         csv_data = f"تقرير غياب يوم: {today_iso}\\nالشركة المشغلة,الوردية,اسم الموظف,رقم الهوية,الوظيفة,القسم\\n"
-        
         absent_html = f"<div class='grand-summary' style='border-color: var(--danger); text-align: center;'>"
         absent_html += f"<h2 style='color: var(--danger);'>🚨 سجل الغياب - {active_shift_title}</h2>"
         absent_html += f"<button class='export-btn' onclick='downloadExcel()'>📥 تحميل كشف الغياب (Excel)</button><div style='text-align: right;'>"
@@ -328,8 +285,7 @@ def generate_master_dashboard():
                 shift_clean = str(shift).replace('أ','ا').replace('إ','ا').replace('آ','ا').replace('ة','ه').strip().lower()
                 is_active = any(kw in shift_clean for kw in shift_keywords)
 
-                if not is_active:
-                    continue
+                if not is_active: continue
 
                 company_has_active_shift = True
                 has_any_shift_in_companies = True
@@ -349,7 +305,6 @@ def generate_master_dashboard():
                         c_dept = row.get('clean_dept', '')
                         
                         absent_rows += f"<tr><td>{c_name}</td><td>{nid}</td><td>{c_job}</td><td>{c_dept}</td></tr>"
-                        # إضافة الموظف لملف الإكسيل
                         csv_data += f"{company},{shift},{c_name},{nid},{c_job},{c_dept}\\n"
                 
                 if absent_count > 0:
@@ -375,7 +330,6 @@ def generate_master_dashboard():
         absent_html += "</div></div>"
         html_content += absent_html
         
-        # --- سكربت التنزيل ---
         html_content += f"""
             <script>
             function downloadExcel() {{
