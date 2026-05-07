@@ -29,15 +29,14 @@ def safe_extract_list(res_json):
 
 def get_hajj_token():
     driver = None
-    try:
+   try:
         print("🌐 [1/4] جاري فتح المتصفح (بوضع التخفي العميق)...")
-        # 🔥 إعدادات متصفح التخفي
         options = uc.ChromeOptions()
         options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         
-      driver = uc.Chrome(options=options, version_main=147)
+        driver = uc.Chrome(options=options, version_main=147)
         
         print("🌐 جاري طلب الرابط...")
         driver.get("https://tnql-prod.sejeltech.app/")
