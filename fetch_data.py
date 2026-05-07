@@ -49,7 +49,7 @@ def get_hajj_token():
                 time.sleep(5)
             except: pass
         
-        wait = WebDriverWait(driver, 15)
+        wait = WebDriverWait(driver, 40)
         user_input = wait.until(EC.presence_of_element_located((By.XPATH, "(//input)[1]")))
         pass_input = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='password']")))
         
