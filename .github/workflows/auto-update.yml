@@ -19,8 +19,7 @@ jobs:
           python-version: '3.10'
 
       - name: 📦 تثبيت المكتبات اللازمة
-        run: |
-          pip install requests pandas openpyxl selenium webdriver-manager run: pip install requests pandas openpyxl selenium undetected-chromedriver
+        run: pip install requests pandas openpyxl selenium webdriver-manager undetected-chromedriver
 
       - name: 🚀 تشغيل كود السحب والدمج
         env:
