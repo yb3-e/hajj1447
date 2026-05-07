@@ -42,7 +42,7 @@ def get_hajj_token():
         driver = webdriver.Chrome(service=service, options=chrome_options)
         
         driver.get("https://tnql-prod.sejeltech.app/")
-        time.sleep(5) 
+        time.sleep(10) 
         if "404" in driver.current_url:
             try:
                 driver.find_element(By.XPATH, "//*[contains(text(), 'HOME')]").click()
