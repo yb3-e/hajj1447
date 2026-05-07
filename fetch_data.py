@@ -17,8 +17,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REPORT_PATH = os.path.join(BASE_DIR, "index.html")
 EXCEL_PATH = os.path.join(BASE_DIR, "staff_data.xlsx") 
 
-USERNAME = os.getenv('HAJJ_USER')
-PASSWORD = os.getenv('HAJJ_PASS')
+USERNAME = os.getenv('HAJJ_USER', 'E1126415635')
+PASSWORD = os.getenv('HAJJ_PASS', '415635')
 
 def safe_extract_list(res_json):
     if not res_json: return []
@@ -77,7 +77,7 @@ def generate_master_dashboard():
     current_time_str = makkah_time.strftime("%Y-%m-%d %I:%M %p")
     hour = makkah_time.hour
     
-    # 🎯 الكلمات المفتاحية الذكية بناءً على المسميات الدقيقة في نظامكم
+    # 🎯 الكلمات المفتاحية الذكية بناءً على المسميات الدقيقة
     if 8 <= hour < 16:
         shift_keywords = ["ثاني", "صباح", "2"]
         active_shift_title = "الوردية الثانية صباح"
@@ -135,20 +135,16 @@ def generate_master_dashboard():
         r_att = requests.post("https://tnql-prod.sejeltech.app/api/EmployeeAttendanceMonitor/GetAttendance", headers=headers, json=payload)
         att_data = safe_extract_list(r_att.json())
         
-        # 🔥 الإضافة الجديدة: فلترة الحضور بناءً على تاريخ "اليوم" فقط
-        today_iso = makkah_time.strftime("%Y-%m-%d") # مثل: 2026-05-06
-        today_ar1 = makkah_time.strftime("%d/%m/%Y") # مثل: 06/05/2026
-        today_ar2 = f"{makkah_time.day}/{makkah_time.month}/{makkah_time.year}" # مثل: 6/5/2026
+        # 🔥 فلترة الحضور لتاريخ اليوم فقط
+        today_iso = makkah_time.strftime("%Y-%m-%d") 
+        today_ar1 = makkah_time.strftime("%d/%m/%Y") 
+        today_ar2 = f"{makkah_time.day}/{makkah_time.month}/{makkah_time.year}" 
 
         present_ids = set()
         for x in att_data:
             if isinstance(x, dict):
-                # تحويل السجل لنص عشان نبحث عن التاريخ بداخله
                 row_str = str(x.values()).lower()
-                
-                # إذا كانت البصمة تحتوي على تاريخ اليوم
                 if today_iso in row_str or today_ar1 in row_str or today_ar2 in row_str:
-                    # وإذا لم يكن مسجل يدوياً كـ "غائب"
                     if "غائب" not in row_str and "absent" not in row_str:
                         emp_code = x.get('employeeCode')
                         if emp_code:
@@ -227,11 +223,15 @@ def generate_master_dashboard():
                 .emp-meta {{ color: #7f8c8d; display: flex; justify-content: space-between; font-family: Tahoma, sans-serif; }}
                 .grand-summary {{ background: #ffffff; border: 4px solid var(--primary); padding: 40px; border-radius: 40px; margin-top: 60px; }}
                 .grand-summary h2 {{ text-align: center; color: var(--primary); font-size: 2.2em; margin-bottom: 35px; font-weight: 900; }}
+                .grand-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }}
+                .grand-item {{ background: #e0f2f1; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; border-right: 5px solid var(--primary); }}
                 .absent-table {{ width: 100%; border-collapse: collapse; text-align: right; margin-top: 15px; font-size: 14px; }}
                 .absent-table th {{ background: #f9ebec; color: var(--danger); padding: 12px; }}
                 .absent-table td {{ padding: 10px; border-bottom: 1px solid #eee; }}
                 .footer {{ text-align: center; margin-top: 80px; padding: 50px; color: #7f8c8d; font-family: 'Courier New', monospace; }}
                 .zero-absent-msg {{ color: var(--success); font-weight: bold; text-align: right; margin-top: 5px; background: #e8f8f5; padding: 10px; border-radius: 8px; font-size: 0.9em; }}
+                .export-btn {{ background: #27ae60; color: white; border: none; padding: 10px 20px; font-family: 'Cairo', sans-serif; font-size: 1.1em; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; display: inline-block; transition: 0.2s; }}
+                .export-btn:hover {{ background: #219653; transform: translateY(-2px); }}
             </style>
         </head>
         <body>
@@ -254,7 +254,7 @@ def generate_master_dashboard():
                 <h2 style='text-align:center; color:var(--primary); margin: 50px 0 30px; font-size: 2.2em;'>🏢 القوى العاملة (جميع الموظفين لكل الشركات)</h2>
         """
 
-        # --- 4. القسم العلوي: جميع الموظفين لكل الشركات ---
+        # --- 4. القسم العلوي: جميع الموظفين لكل الشركات (بالتفصيل القديم اللي يعجبك) ---
         for company in df['operatorCompanyName'].unique():
             if pd.isna(company) or company == 'غير محدد': continue
             html_content += f"<div class='company-card'><div class='company-title'>🏢 {company}</div><div class='shift-grid'>"
@@ -280,8 +280,22 @@ def generate_master_dashboard():
                 html_content += f"<div class='shift-box'><span class='shift-name'><span>📍 {shift}</span><span class='shift-total-badge'>العدد: {shift_total}</span></span><ul class='jobs-list'>{jobs_html}</ul></div>"
             html_content += "</div></div>"
 
-        # --- 5. قسم الغياب: ذكي وموثوق بالوقت ---
-        absent_html = f"<div class='grand-summary' style='border-color: var(--danger);'><h2 style='color: var(--danger);'>🚨 سجل الغياب - {active_shift_title}</h2>"
+        # --- 4.5 الإضافة الجديدة: الإجمالي العام للوظائف (لكافة الشركات) ---
+        total_job_counts = df['occupationName'].value_counts()
+        jobs_summary_html = "<div class='grand-summary' style='padding: 30px; margin-bottom: 40px;'><h2 style='text-align:center; color:var(--primary); font-size: 2em; margin-bottom: 25px;'>📊 الإجمالي الشامل للوظائف (كافة الشركات)</h2><div class='grand-grid'>"
+        for j, v in total_job_counts.items():
+            jobs_summary_html += f"<div class='grand-item'><span style='color:var(--secondary); font-size:1.1em;'>{j}</span><span class='job-val' style='font-size:1.3em;'>{v}</span></div>"
+        jobs_summary_html += "</div></div>"
+        
+        html_content += jobs_summary_html
+
+        # --- 5. قسم الغياب: ذكي وموثوق بالوقت + زر الإكسيل ---
+        csv_data = f"تقرير غياب يوم: {today_iso}\\nالشركة المشغلة,الوردية,اسم الموظف,رقم الهوية,الوظيفة,القسم\\n"
+        
+        absent_html = f"<div class='grand-summary' style='border-color: var(--danger); text-align: center;'>"
+        absent_html += f"<h2 style='color: var(--danger);'>🚨 سجل الغياب - {active_shift_title}</h2>"
+        absent_html += f"<button class='export-btn' onclick='downloadExcel()'>📥 تحميل كشف الغياب (Excel)</button><div style='text-align: right;'>"
+        
         has_any_shift_in_companies = False
 
         for company in df['operatorCompanyName'].unique():
@@ -311,7 +325,13 @@ def generate_master_dashboard():
                     
                     if eid not in present_ids and nid not in present_ids:
                         absent_count += 1
-                        absent_rows += f"<tr><td>{row.get('clean_name')}</td><td>{nid}</td><td>{row.get('occupationName')}</td><td>{row.get('clean_dept')}</td></tr>"
+                        c_name = row.get('clean_name', '')
+                        c_job = row.get('occupationName', '')
+                        c_dept = row.get('clean_dept', '')
+                        
+                        absent_rows += f"<tr><td>{c_name}</td><td>{nid}</td><td>{c_job}</td><td>{c_dept}</td></tr>"
+                        # إضافة الموظف لملف الإكسيل
+                        csv_data += f"{company},{shift},{c_name},{nid},{c_job},{c_dept}\\n"
                 
                 if absent_count > 0:
                     comp_absent_html += f"""
@@ -333,11 +353,25 @@ def generate_master_dashboard():
         if not has_any_shift_in_companies:
             absent_html += f"<h3 style='color:#7f8c8d; text-align:center; margin-top: 30px;'>لا توجد بيانات مسجلة لـ ({active_shift_title}) في جميع الشركات.</h3>"
 
-        absent_html += "</div>"
-        
+        absent_html += "</div></div>"
         html_content += absent_html
         
+        # --- سكربت التنزيل ---
         html_content += f"""
+            <script>
+            function downloadExcel() {{
+                var csv = `{csv_data}`;
+                var blob = new Blob(["\\uFEFF" + csv], {{ type: 'text/csv;charset=utf-8;' }});
+                var url = URL.createObjectURL(blob);
+                var link = document.createElement("a");
+                link.href = url;
+                link.download = "سجل_الغياب_{today_iso}.csv";
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }}
+            </script>
             <div class="footer" dir="ltr">
                 AUTOMATED SYSTEM PREPARED BY<br>
                 <b style="color: var(--primary); font-size: 1.5em;">Eng. Abdulaziz Alshehri</b>
