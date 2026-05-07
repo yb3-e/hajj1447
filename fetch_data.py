@@ -3,7 +3,6 @@ import os
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
-# 🔥 الاستدعاءات الجديدة الخاصة بالتخفي
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -15,8 +14,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REPORT_PATH = os.path.join(BASE_DIR, "index.html")
 EXCEL_PATH = os.path.join(BASE_DIR, "staff_data.xlsx") 
 
-USERNAME = os.getenv('HAJJ_USER')
-PASSWORD = os.getenv('HAJJ_PASS')
+USERNAME = os.getenv('HAJJ_USER', 'E1126415635')
+PASSWORD = os.getenv('HAJJ_PASS', '415635')
 
 def safe_extract_list(res_json):
     if not res_json: return []
@@ -29,7 +28,7 @@ def safe_extract_list(res_json):
 
 def get_hajj_token():
     driver = None
-   try:
+    try:
         print("🌐 [1/4] جاري فتح المتصفح (بوضع التخفي العميق)...")
         options = uc.ChromeOptions()
         options.add_argument("--headless=new")
